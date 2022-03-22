@@ -66,6 +66,8 @@ flutter:
    - images/red_delete.png
    - images/warning.png
    - images/ic_register.png
+   - images/bg_img.png
+   - images/img_logos.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

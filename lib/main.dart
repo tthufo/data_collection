@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './splash.dart';
+import './login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,11 +11,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Data Collection',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SplashView(title: 'VRP'),
+      home: const LoginView(),
     );
   }
 }

@@ -1,89 +1,49 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import './result.dart';
-import './test.dart';
 import 'package:http/http.dart' as http;
-import 'dart:typed_data';
+import './tab.dart';
 
 class LoginView extends StatelessWidget {
-  final String vrpOption;
-  const LoginView({Key? key, required this.vrpOption}) : super(key: key);
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: const Text("Thông tin xác thực"),
-        automaticallyImplyLeading: true,
-      ),
-      body: SingleChildScrollView(
-          child: Center(
-        child: MyHomePage(option: vrpOption),
-      )),
-    );
+        body: Stack(
+      children: <Widget>[
+        Container(
+          decoration: const BoxDecoration(
+            color: Colors.pink,
+            // image: DecorationImage(
+            //   image: AssetImage("images/bg_img.png"),
+            //   fit: BoxFit.cover,
+            // ),
+          ),
+        ),
+        const Center(
+          child: SingleChildScrollView(child: Center(child: MyHomePage())),
+        )
+      ],
+    ));
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  final String option;
-  const MyHomePage({Key? key, required this.option}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
-  String id = "";
-
   String name = "";
 
-  String birthDay = "";
-
-  String address = "";
+  String password = "";
 
   String errorMessage = "";
 
-  String vrpResult = "";
-
-  bool showResult = false;
-
   static final TextEditingController _textController = TextEditingController();
-
-  static const channel = MethodChannel('vmg.ekyc/VRP');
-
-  Future<void> _callForVRP(option) async {
-    try {
-      await channel.invokeMethod(
-          'VRP', <String, String>{'option': option}).then((onValue) {
-        if (onValue != "") {
-          // Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //         builder: (context) => const TestView(title: 'ndd')));
-          setState(() {
-            vrpResult = onValue;
-            showResult = true;
-          });
-        } else {
-          setState(() {
-            showResult = true;
-          });
-          // Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //         builder: (context) => const TestView(title: 'ndd')));
-        }
-      });
-    } on PlatformException catch (e) {
-      print('Failed : ${e.message}');
-      setState(() {
-        errorMessage = e.message!;
-      });
-    }
-  }
 
   Future<dynamic> didRequestLogin(message) async {
     Map<String, dynamic> body = {"message": message};
@@ -102,70 +62,73 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       obscureText: false,
       onChanged: (text) {
         setState(() {
-          id = text;
+          name = text;
           errorMessage = "";
         });
       },
-      style: const TextStyle(fontFamily: 'Montserrat', fontSize: 15.0),
+      style: const TextStyle(
+          fontFamily: 'Montserrat', fontSize: 17.0, color: Colors.white),
       decoration: InputDecoration(
-          contentPadding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Số CMT/ CCCD",
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.5),
+        contentPadding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        hintText: "Tên đăng nhập",
+        hintStyle: const TextStyle(color: Colors.white),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+      ),
     );
   }
 
   Widget passwordField() {
     return TextField(
-      obscureText: false,
-      onChanged: (text) {
-        setState(() {
-          name = text;
-          errorMessage = "";
-        });
-      },
-      style: const TextStyle(fontFamily: 'Montserrat', fontSize: 15.0),
-      decoration: InputDecoration(
+        obscureText: true,
+        onChanged: (text) {
+          setState(() {
+            password = text;
+            errorMessage = "";
+          });
+        },
+        style: const TextStyle(
+            fontFamily: 'Montserrat', fontSize: 17.0, color: Colors.white),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.5),
           contentPadding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Họ và tên",
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
-    );
+          hintText: "Mật khẩu",
+          hintStyle: const TextStyle(color: Colors.white),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+        ));
   }
 
-  Widget birthDayField() {
-    return TextField(
-      obscureText: false,
-      onChanged: (text) {
-        setState(() {
-          birthDay = text;
-          errorMessage = "";
-        });
-      },
-      style: const TextStyle(fontFamily: 'Montserrat', fontSize: 15.0),
-      decoration: InputDecoration(
-          contentPadding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Ngày tháng năm sinh",
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
-    );
-  }
-
-  Widget addressField() {
-    return TextField(
-      obscureText: false,
-      onChanged: (text) {
-        setState(() {
-          address = text;
-          errorMessage = "";
-        });
-      },
-      style: const TextStyle(fontFamily: 'Montserrat', fontSize: 15.0),
-      decoration: InputDecoration(
-          contentPadding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Địa chỉ",
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+  Container forgot() {
+    return Container(
+      height: 30,
+      alignment: Alignment.centerRight,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(color: null),
+        child: GestureDetector(
+          onTap: () {},
+          child: const Text(
+            "Quên mật khẩu?",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -173,118 +136,83 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return Container(
         child: Material(
       elevation: 5.0,
-      borderRadius: BorderRadius.circular(30.0),
-      color: const Color(0xff01A0C7),
+      borderRadius: BorderRadius.circular(10.0),
+      color: Colors.greenAccent,
       child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width - 120,
+        minWidth: MediaQuery.of(context).size.width - 0,
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
           onClickAction();
         },
-        child: const Text("Xác thực thông tin",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontFamily: 'Montserrat', color: Colors.white, fontSize: 18.0)),
+        child: const Text(
+          "Đăng nhập",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: 'Montserrat',
+            color: Colors.white,
+            fontSize: 18.0,
+          ),
+        ),
       ),
     ));
   }
 
-  Container empty() {
-    return Container(
-        child: Column(
-      children: [
-        const Text('Không có thông tin xác thực',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            )),
-        const SizedBox(height: 35.0),
-        Material(
-          elevation: 5.0,
-          borderRadius: BorderRadius.circular(30.0),
-          color: const Color(0xff01A0C7),
-          child: MaterialButton(
-            minWidth: MediaQuery.of(context).size.width - 120,
-            padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-            onPressed: () {
-              setState(() {
-                showResult = false;
-              });
-            },
-            child: const Text("Xác thực lại thông tin",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    color: Colors.white,
-                    fontSize: 18.0)),
-          ),
-        )
-      ],
-    ));
-  }
-
-  void _didRequest(option) {
-    if (id.isEmpty || name.isEmpty || address.isEmpty || birthDay.isEmpty) {
+  void _didRequestLogin() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const TabView(title: "Quản lý")));
+    if (password.isEmpty || name.isEmpty) {
       setState(() {
         errorMessage = "Bạn cần nhập đủ thông tin xác thực";
       });
       return;
     }
-    _callForVRP(option);
   }
 
   Widget body() {
     return Padding(
-        padding: EdgeInsets.all(showResult ? 0.0 : 16),
-        child: showResult
-            ? vrpResult == ""
-                ? empty()
-                : ResultView(
-                    data: vrpResult,
-                    id: id,
-                    name: name,
-                    birthDay: birthDay,
-                    address: address)
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    child: const Text(""),
-                    color: Colors.grey,
-                    height: MediaQuery.of(context).size.height * 0.06,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text("Nhập thông tin của CMT/ Thẻ căn cước",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ))
-                    ],
-                  ),
-                  const SizedBox(height: 35.0),
-                  emailField(),
-                  const SizedBox(height: 35.0),
-                  passwordField(),
-                  const SizedBox(height: 35.0),
-                  birthDayField(),
-                  const SizedBox(height: 35.0),
-                  addressField(),
-                  const SizedBox(height: 15.0),
-                  Text(errorMessage,
-                      style: const TextStyle(
-                        color: Colors.red,
-                        fontStyle: FontStyle.italic,
-                        fontSize: 14,
-                      )),
-                  const SizedBox(height: 25.0),
-                  buttoning(onClickAction: () => _didRequest(widget.option))
-                ],
-              ));
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              child: const Text(""),
+              color: Colors.grey,
+              height: MediaQuery.of(context).size.height * 0.06,
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text("Công cụ thu thập dữ liệu \nPhòng chống thiên tai",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    )),
+              ],
+            ),
+            const SizedBox(height: 45.0),
+            Image.asset("images/img_logos.png",
+                height: 120, width: 120, fit: BoxFit.cover),
+            const SizedBox(height: 45.0),
+            emailField(),
+            const SizedBox(height: 35.0),
+            passwordField(),
+            forgot(),
+            const SizedBox(height: 5.0),
+            Text(errorMessage,
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 14,
+                )),
+            const SizedBox(height: 15.0),
+            buttoning(onClickAction: () => {_didRequestLogin()})
+          ],
+        ));
   }
 
   @override

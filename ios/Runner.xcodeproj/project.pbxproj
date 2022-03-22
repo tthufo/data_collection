@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,8 +14,6 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		C42C20827BD34987AF88071C /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C4F9082FAC2F4A9FF6DDA33 /* Pods_Runner.framework */; };
-		FC1DF3CF27DA680F00B6DAD3 /* VRP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1DF3CD27DA680800B6DAD3 /* VRP.framework */; platformFilter = ios; };
-		FC1DF3D027DA680F00B6DAD3 /* VRP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FC1DF3CD27DA680800B6DAD3 /* VRP.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FC6BF62827B1623C007824F2 /* VRPExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = FC6BF62627B1623C007824F2 /* VRPExtension.m */; };
 /* End PBXBuildFile section */
 
@@ -26,7 +24,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				FC1DF3D027DA680F00B6DAD3 /* VRP.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -51,7 +48,6 @@
 		9C4F9082FAC2F4A9FF6DDA33 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A73E40A6984022520008B676 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		E1BF5DD9895B2CD43DF81254 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
-		FC1DF3CD27DA680800B6DAD3 /* VRP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = VRP.framework; sourceTree = "<group>"; };
 		FC6BF62627B1623C007824F2 /* VRPExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VRPExtension.m; sourceTree = "<group>"; };
 		FC6BF62727B1623C007824F2 /* VRPExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VRPExtension.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -62,7 +58,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C42C20827BD34987AF88071C /* Pods_Runner.framework in Frameworks */,
-				FC1DF3CF27DA680F00B6DAD3 /* VRP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,7 +85,6 @@
 		9740EEB11CF90186004384FC /* Flutter */ = {
 			isa = PBXGroup;
 			children = (
-				FC1DF3CD27DA680800B6DAD3 /* VRP.framework */,
 				3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */,
 				9740EEB21CF90195004384FC /* Debug.xcconfig */,
 				7AFA3C8E1D35360C0083082E /* Release.xcconfig */,

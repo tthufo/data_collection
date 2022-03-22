@@ -29,8 +29,8 @@ class Option extends StatefulWidget {
 
 class _MyHomePageState extends State<Option> with WidgetsBindingObserver {
   goToLogin(String opt) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => LoginView(vrpOption: opt)));
+    // Navigator.push(context,
+    //     MaterialPageRoute(builder: (context) => LoginView(vrpOption: opt)));
   }
 
   @override
