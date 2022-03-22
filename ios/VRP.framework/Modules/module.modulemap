@@ -1,0 +1,11 @@
+framework module VRP {
+  umbrella header "VRP.h"
+
+  export *
+  module * { export * }
+}
+
+module VRP.Swift {
+    header "VRP-Swift.h"
+    requires objc
+}
