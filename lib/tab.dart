@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import './tabs/list.dart';
+import './tabs/construct.dart';
+import './tabs/civil.dart';
 
 class TabView extends StatelessWidget {
   final String title;
@@ -62,26 +64,10 @@ class _MyHomePageState extends State<Option> with TickerProviderStateMixin {
           child: ColoredBox(color: Colors.white, child: _tabBar),
         ),
       ),
-      body: TabBarView(controller: _controller, children: [
-        Container(
-          color: Colors.lightBlueAccent,
-          child: const Center(
-            child: Text(
-              'Profile',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-        Container(
-          color: Colors.purpleAccent,
-          child: const Center(
-            child: Text(
-              'Match',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-        const Listing(title: "")
+      body: TabBarView(controller: _controller, children: const [
+        CivilView(title: ""),
+        ContructView(title: ""),
+        Listing(title: "")
       ]),
     );
   }
