@@ -40,12 +40,13 @@ class _MyHomePageState extends State<Option> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _controller = TabController(vsync: this, length: 3);
+    _controller = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
     super.dispose();
+    _controller.dispose();
   }
 
   @override
@@ -71,4 +72,7 @@ class _MyHomePageState extends State<Option> with TickerProviderStateMixin {
       ]),
     );
   }
+
+  // @override
+  // bool get wantKeepAlive => true;
 }

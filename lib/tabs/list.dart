@@ -18,7 +18,8 @@ class Option extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<Option> with WidgetsBindingObserver {
+class _MyHomePageState extends State<Option>
+    with AutomaticKeepAliveClientMixin {
   List<dynamic> rowData = <dynamic>[];
 
   String _selectedGender = '0';
@@ -153,4 +154,7 @@ class _MyHomePageState extends State<Option> with WidgetsBindingObserver {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

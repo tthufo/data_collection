@@ -1,157 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../component/civil_card.dart';
 
-class CivilView extends StatelessWidget {
+class CivilCard extends StatefulWidget {
   final String title;
 
-  const CivilView({Key? key, required this.title}) : super(key: key);
+  final Map<String, dynamic> obj;
 
-  @override
-  Widget build(BuildContext context) {
-    return const SingleChildScrollView(child: Center(child: Option()));
-  }
-}
+  final Function(Map<String, dynamic>) onSelectionChanged;
 
-class Option extends StatefulWidget {
-  const Option({Key? key}) : super(key: key);
+  const CivilCard(
+      {Key? key,
+      required this.title,
+      required this.obj,
+      required this.onSelectionChanged})
+      : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<Option>
-    with AutomaticKeepAliveClientMixin {
-  List<dynamic> rowData = <dynamic>[];
-
+class _MyHomePageState extends State<CivilCard> {
   String _selectedGender = '0';
 
   bool checkedValue = false;
 
   String birthDay = "";
 
-  var people1 = {
-    'name': 'pter',
-    'age': 20,
-    'bla': '',
-  };
-
-  Map<String, dynamic> obj = {
-    'name': 'pter',
-    'age': 20,
-    'bla': '',
-  };
-
   @override
   void initState() {
     super.initState();
-    setState(() {
-      rowData = [1, 2, 3];
-    });
+    // setState(() {
+
+    // });
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('state = $state');
-  }
-
-  Column header() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-            padding: EdgeInsets.fromLTRB(0, 10, 10, 20),
-            child: Text(
-              'Hộ số: 001',
-              style: TextStyle(
-                  color: Colors.redAccent, fontWeight: FontWeight.bold),
-            )),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            buttoning(onClickAction: () => {print(obj)}),
-            Expanded(
-                flex: 1,
-                child: Row(children: [
-                  Text(
-                    'Kinh độ:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Flexible(child: Text('12.', maxLines: 1)),
-                ])),
-            const SizedBox(
-              width: 5,
-            ),
-            Expanded(
-                flex: 1,
-                child: Row(children: [
-                  Text(
-                    'Vĩ độ:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Flexible(child: Text('12.1436332434', maxLines: 1)),
-                ])),
-          ],
-        ),
-        Container(
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: [
-                Checkbox(
-                  checkColor: Colors.white,
-                  activeColor: Colors.greenAccent,
-                  value: checkedValue,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      checkedValue = !checkedValue;
-                    });
-                  },
-                ),
-                Text(
-                  obj['obj'],
-                  style: TextStyle(fontSize: 14),
-                )
-              ],
-            ))
-      ],
-    );
-  }
-
-  Container buttoning({required Function onClickAction}) {
-    return Container(
-        decoration: BoxDecoration(
-            border: Border.all(color: Colors.greenAccent),
-            borderRadius: BorderRadius.circular(10.0)),
-        margin: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-        child: Material(
-            elevation: 5.0,
-            borderRadius: BorderRadius.circular(10.0),
-            color: Colors.white,
-            child: SizedBox(
-              width: 100,
-              height: 35,
-              child: MaterialButton(
-                minWidth: 60,
-                height: 40,
-                onPressed: () {
-                  onClickAction();
-                },
-                child: const Text(
-                  "Nhận tọa độ",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    color: Colors.greenAccent,
-                    fontSize: 12.0,
-                  ),
-                ),
-              ),
-            )));
   }
 
   Card card(BuildContext context) {
@@ -165,7 +50,7 @@ class _MyHomePageState extends State<Option>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Text("Người thứ 1 (chủ hộ):"),
+                      child: Text(widget.title),
                     ),
                     Expanded(
                       child: Row(
@@ -207,6 +92,8 @@ class _MyHomePageState extends State<Option>
                             onChanged: (bool? value) {
                               setState(() {
                                 checkedValue = !checkedValue;
+                                widget.obj['bla'] = "blarrrrhr";
+                                widget.onSelectionChanged(widget.obj);
                               });
                             },
                           ),
@@ -287,34 +174,8 @@ class _MyHomePageState extends State<Option>
     );
   }
 
-  Widget body(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const SizedBox(height: 15.0),
-            header(),
-            card(context),
-            CivilCard(
-              title: 'ahii',
-              obj: obj,
-              onSelectionChanged: (selectedItem) {
-                setState(() {
-                  obj = selectedItem;
-                });
-              },
-            ),
-          ],
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
-    return body(context);
+    return card(context);
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
