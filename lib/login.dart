@@ -182,6 +182,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               color: Colors.grey,
               height: MediaQuery.of(context).size.height * 0.06,
             ),
+            Image.asset("images/img_logos.png",
+                height: 120, width: 120, fit: BoxFit.cover),
+            const SizedBox(height: 45.0),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
@@ -194,9 +197,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     )),
               ],
             ),
-            const SizedBox(height: 45.0),
-            Image.asset("images/img_logos.png",
-                height: 120, width: 120, fit: BoxFit.cover),
             const SizedBox(height: 45.0),
             emailField(),
             const SizedBox(height: 35.0),

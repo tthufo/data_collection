@@ -29,9 +29,6 @@ class _MyHomePageState extends State<CivilCard> {
   @override
   void initState() {
     super.initState();
-    // setState(() {
-
-    // });
   }
 
   @override

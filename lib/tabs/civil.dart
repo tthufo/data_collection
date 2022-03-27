@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../component/civil_card.dart';
+import '../component/buttoning.dart';
+import 'package:geolocator/geolocator.dart';
 
 class CivilView extends StatelessWidget {
   final String title;
@@ -9,7 +10,7 @@ class CivilView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(child: Center(child: Option()));
+    return const Center(child: Option());
   }
 }
 
@@ -22,32 +23,72 @@ class Option extends StatefulWidget {
 
 class _MyHomePageState extends State<Option>
     with AutomaticKeepAliveClientMixin {
-  List<dynamic> rowData = <dynamic>[];
-
-  String _selectedGender = '0';
-
   bool checkedValue = false;
 
-  String birthDay = "";
-
-  var people1 = {
-    'name': 'pter',
-    'age': 20,
-    'bla': '',
-  };
-
   Map<String, dynamic> obj = {
-    'name': 'pter',
-    'age': 20,
-    'bla': '',
+    'title': 'Người thứ 1 (chủ hộ):',
+    'birthDay': '',
+    'gender': '0',
+    'defect': '0',
   };
+
+  List<dynamic> listing = <dynamic>[];
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // Position currPos = await Geolocator.getCurrentPosition(
+    //     desiredAccuracy: LocationAccuracy.high);
+
+    // print(currPos.altitude);
+
+    return await Geolocator.getCurrentPosition();
+  }
+
+  _resetState() {
+    setState(() {
+      listing.clear();
+    });
+    Future.delayed(const Duration(milliseconds: 200), () {
+      setState(() {
+        listing.add(obj);
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      rowData = [1, 2, 3];
-    });
+    _resetState();
   }
 
   @override
@@ -55,16 +96,23 @@ class _MyHomePageState extends State<Option>
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('state = $state');
+  _addMember() {
+    Map<String, dynamic> objd = {
+      'title': 'Người thứ ${listing.length + 1}:',
+      'birthDay': '',
+      'gender': '0',
+      'defect': '0',
+    };
+    setState(() {
+      listing.add(objd);
+    });
   }
 
   Column header() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
+        const Padding(
             padding: EdgeInsets.fromLTRB(0, 10, 10, 20),
             child: Text(
               'Hộ số: 001',
@@ -74,10 +122,20 @@ class _MyHomePageState extends State<Option>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            buttoning(onClickAction: () => {print(obj)}),
+            Buttoning(
+              title: "Nhận tọa độ",
+              onClickAction: () => {print(_determinePosition())},
+              obj: const {
+                'borderColor': Colors.greenAccent,
+                'titleColor': Colors.black,
+              },
+            ),
+            const SizedBox(
+              width: 10,
+            ),
             Expanded(
                 flex: 1,
-                child: Row(children: [
+                child: Row(children: const [
                   Text(
                     'Kinh độ:',
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -89,7 +147,7 @@ class _MyHomePageState extends State<Option>
             ),
             Expanded(
                 flex: 1,
-                child: Row(children: [
+                child: Row(children: const [
                   Text(
                     'Vĩ độ:',
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -112,8 +170,8 @@ class _MyHomePageState extends State<Option>
                     });
                   },
                 ),
-                Text(
-                  obj['obj'],
+                const Text(
+                  "Hộ nghèo",
                   style: TextStyle(fontSize: 14),
                 )
               ],
@@ -122,192 +180,75 @@ class _MyHomePageState extends State<Option>
     );
   }
 
-  Container buttoning({required Function onClickAction}) {
-    return Container(
-        decoration: BoxDecoration(
-            border: Border.all(color: Colors.greenAccent),
-            borderRadius: BorderRadius.circular(10.0)),
-        margin: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-        child: Material(
-            elevation: 5.0,
-            borderRadius: BorderRadius.circular(10.0),
-            color: Colors.white,
-            child: SizedBox(
-              width: 100,
-              height: 35,
-              child: MaterialButton(
-                minWidth: 60,
-                height: 40,
-                onPressed: () {
-                  onClickAction();
-                },
-                child: const Text(
-                  "Nhận tọa độ",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    color: Colors.greenAccent,
-                    fontSize: 12.0,
-                  ),
-                ),
-              ),
-            )));
+  Widget addRow() {
+    return Column(
+        children: listing.map(
+      (item) {
+        var index = listing.indexOf(item);
+        return CivilCard(
+          title: item['title'],
+          obj: item,
+          onSelectionChanged: (selectedItem) {
+            setState(() {
+              listing[index] = selectedItem;
+            });
+          },
+        );
+      },
+    ).toList());
   }
 
-  Card card(BuildContext context) {
-    return Card(
-        child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text("Người thứ 1 (chủ hộ):"),
-                    ),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Text("Sinh năm:"),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Expanded(
-                              child: GestureDetector(
-                                  onTap: () {
-                                    _selectDate(context);
-                                  },
-                                  child: Container(
-                                      height: 30,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.grey),
-                                          borderRadius:
-                                              BorderRadius.circular(4.0)),
-                                      child: Text(birthDay))))
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(flex: 1, child: radios()),
-                    Container(
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            checkColor: Colors.white,
-                            activeColor: Colors.greenAccent,
-                            value: checkedValue,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                checkedValue = !checkedValue;
-                              });
-                            },
-                          ),
-                          const Text(
-                            'Khuyết tật',
-                            style: TextStyle(fontSize: 14),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            )));
-  }
-
-  DateTime selectedDate = DateTime.now();
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-        birthDay = DateFormat('dd/MM/yyyy').format(selectedDate);
-      });
-    }
-  }
-
-  Row radios() {
+  Row footer() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Row(
-            children: [
-              Radio<String>(
-                value: '0',
-                groupValue: _selectedGender,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedGender = value!;
-                  });
-                },
-                activeColor: Colors.greenAccent,
-              ),
-              const Text(
-                'Nam',
-                style: TextStyle(fontSize: 14),
-              )
-            ],
-          ),
+        Buttoning(
+          title: "Thêm người",
+          onClickAction: () => {_addMember()},
+          obj: const {
+            'bgColor': Colors.blueAccent,
+            'titleColor': Colors.white,
+          },
         ),
-        Expanded(
-          child: Row(
-            children: [
-              Radio<String>(
-                value: '1',
-                groupValue: _selectedGender,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedGender = value!;
-                  });
-                },
-                activeColor: Colors.greenAccent,
-              ),
-              const Text(
-                'Nữ',
-                style: TextStyle(fontSize: 14),
-              )
-            ],
-          ),
+        Buttoning(
+          title: "Hủy",
+          onClickAction: () => {_resetState()},
+          obj: const {
+            'bgColor': Colors.redAccent,
+            'titleColor': Colors.white,
+          },
+        ),
+        Buttoning(
+          title: "Cập nhật",
+          onClickAction: () => {print(listing)},
+          obj: const {
+            'bgColor': Colors.greenAccent,
+            'titleColor': Colors.white,
+          },
         ),
       ],
     );
   }
 
   Widget body(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const SizedBox(height: 15.0),
-            header(),
-            card(context),
-            CivilCard(
-              title: 'ahii',
-              obj: obj,
-              onSelectionChanged: (selectedItem) {
-                setState(() {
-                  obj = selectedItem;
-                });
-              },
-            ),
-          ],
-        ));
+    return Column(children: [
+      Expanded(
+          flex: 9,
+          child: SingleChildScrollView(
+              child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      const SizedBox(height: 10.0),
+                      header(),
+                      addRow(),
+                    ],
+                  )))),
+      Expanded(child: footer()),
+    ]);
   }
 
   @override
