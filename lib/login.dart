@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import './tab.dart';
+import './option.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -22,7 +22,7 @@ class LoginView extends StatelessWidget {
           ),
         ),
         const Center(
-          child: SingleChildScrollView(child: Center(child: MyHomePage())),
+          child: Center(child: MyHomePage()),
         )
       ],
     ));
@@ -159,9 +159,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   void _didRequestLogin() {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const TabView(title: "Quản lý")));
+        context, MaterialPageRoute(builder: (context) => const OptionView()));
     if (password.isEmpty || name.isEmpty) {
       setState(() {
         errorMessage = "Bạn cần nhập đủ thông tin xác thực";
@@ -184,20 +182,27 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             ),
             Image.asset("images/img_logos.png",
                 height: 120, width: 120, fit: BoxFit.cover),
-            const SizedBox(height: 45.0),
+            const SizedBox(height: 15.0),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
-                Text("Công cụ thu thập dữ liệu \nPhòng chống thiên tai",
+                Text("CÔNG CỤ THU THẬP DỮ LIỆU",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                    )),
+                Text("PHỤC VỤ PHÒNG CHỐNG THIÊN TAI",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     )),
               ],
             ),
-            const SizedBox(height: 45.0),
+            const SizedBox(height: 25.0),
             emailField(),
             const SizedBox(height: 35.0),
             passwordField(),
@@ -235,6 +240,30 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return body();
+    return Column(
+      children: [
+        Expanded(
+            flex: 9,
+            child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(), child: body())),
+        Container(
+            alignment: Alignment.center,
+            height: 60,
+            child: Column(
+              children: [
+                Container(
+                    margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: const Divider(color: Colors.grey)),
+                const Text(
+                    'Công cụ được quản lý bởi bản chỉ đạo quốc gia về \n PCTT và hỗ trợ UNDP, Green Climate Fund',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic))
+              ],
+            )),
+      ],
+    );
   }
 }

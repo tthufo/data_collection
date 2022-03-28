@@ -42,7 +42,7 @@ class Buttoning extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Montserrat',
                     color: obj['titleColor'] ?? Colors.black,
-                    fontSize: 12.0,
+                    fontSize: obj['fontSize'] ?? 12.0,
                   ),
                 ),
               ),

@@ -32,6 +32,11 @@ class _MyHomePageState extends State<Option>
     'defect': '0',
   };
 
+  Map<String, dynamic> latLong = {
+    'lat': '-',
+    'long': '-',
+  };
+
   List<dynamic> listing = <dynamic>[];
 
   Future<Position> _determinePosition() async {
