@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './component/buttoning.dart';
 import './civlization/civil.dart';
+import './school/school.dart';
 
 class OptionView extends StatelessWidget {
   const OptionView({Key? key}) : super(key: key);
@@ -88,22 +89,25 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 'fontSize': 20.0
               },
             ),
-            const SizedBox(height: 25.0),
-            Buttoning(
-              title: "NHÀ VĂN HÓA",
-              onClickAction: () => {},
-              obj: {
-                'borderColor': Colors.black,
-                'titleColor': Colors.black,
-                'width': MediaQuery.of(context).size.width * 0.6,
-                'height': 50.0,
-                'fontSize': 20.0
-              },
-            ),
+            // const SizedBox(height: 25.0),
+            // Buttoning(
+            //   title: "NHÀ VĂN HÓA",
+            //   onClickAction: () => {},
+            //   obj: {
+            //     'borderColor': Colors.black,
+            //     'titleColor': Colors.black,
+            //     'width': MediaQuery.of(context).size.width * 0.6,
+            //     'height': 50.0,
+            //     'fontSize': 20.0
+            //   },
+            // ),
             const SizedBox(height: 25.0),
             Buttoning(
               title: "TRƯỜNG HỌC",
-              onClickAction: () => {},
+              onClickAction: () => {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const SchoolView()))
+              },
               obj: {
                 'borderColor': Colors.black,
                 'titleColor': Colors.black,
@@ -112,31 +116,31 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 'fontSize': 20.0
               },
             ),
-            const SizedBox(height: 25.0),
-            Buttoning(
-              title: "ỦY BAN NHÂN DÂN",
-              onClickAction: () => {},
-              obj: {
-                'borderColor': Colors.black,
-                'titleColor': Colors.black,
-                'width': MediaQuery.of(context).size.width * 0.6,
-                'height': 50.0,
-                'fontSize': 20.0
-              },
-            ),
-            const SizedBox(height: 25.0),
-            Buttoning(
-              title: "BỆNH VIỆN",
-              onClickAction: () => {},
-              obj: {
-                'borderColor': Colors.black,
-                'titleColor': Colors.black,
-                'width': MediaQuery.of(context).size.width * 0.6,
-                'height': 50.0,
-                'fontSize': 20.0
-              },
-            ),
-            const SizedBox(height: 25.0),
+            // const SizedBox(height: 25.0),
+            // Buttoning(
+            //   title: "ỦY BAN NHÂN DÂN",
+            //   onClickAction: () => {},
+            //   obj: {
+            //     'borderColor': Colors.black,
+            //     'titleColor': Colors.black,
+            //     'width': MediaQuery.of(context).size.width * 0.6,
+            //     'height': 50.0,
+            //     'fontSize': 20.0
+            //   },
+            // ),
+            // const SizedBox(height: 25.0),
+            // Buttoning(
+            //   title: "BỆNH VIỆN",
+            //   onClickAction: () => {},
+            //   obj: {
+            //     'borderColor': Colors.black,
+            //     'titleColor': Colors.black,
+            //     'width': MediaQuery.of(context).size.width * 0.6,
+            //     'height': 50.0,
+            //     'fontSize': 20.0
+            //   },
+            // ),
+            // const SizedBox(height: 25.0),
           ],
         ));
   }

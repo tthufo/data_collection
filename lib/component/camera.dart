@@ -11,7 +11,87 @@ class CameraView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return camview(context);
+    return caming();
+  }
+
+  Widget caming() {
+    return Column(
+      children: [
+        const Divider(
+          color: Colors.black,
+        ),
+        Container(
+          margin: const EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text('Ảnh hộ gia đình',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black)),
+              Text('(Thực hiện sau khi đã xong thông tin trên)',
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            GestureDetector(
+                onTap: () {
+                  onClickAction('2');
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      'Tải file ảnh',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      '(tên ảnh)',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    )
+                  ],
+                )),
+            GestureDetector(
+                onTap: () {
+                  onClickAction('1');
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      'Chụp ảnh',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      '(tên ảnh)',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    )
+                  ],
+                ))
+          ],
+        )
+      ],
+    );
   }
 
   Widget roundedRectBorderWidget(BuildContext context) {

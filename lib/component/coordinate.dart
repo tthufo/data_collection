@@ -74,75 +74,86 @@ class _MyHomePageState extends State<CoordinateView> {
     super.dispose();
   }
 
-  Row header() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Column header() {
+    return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Vị trí:",
-              style: TextStyle(fontSize: 14),
+            Row(
+              children: [
+                const Text(
+                  "Vị trí:",
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(
+                  width: 15,
+                ),
+                SizedBox(
+                    height: 24.0,
+                    width: 24.0,
+                    child: loading
+                        ? const CircularProgressIndicator()
+                        : Checkbox(
+                            checkColor: Colors.white,
+                            activeColor: Colors.greenAccent,
+                            value: checkedValue,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                checkedValue = !checkedValue;
+                                if (checkedValue) {
+                                  setState(() {
+                                    loading = true;
+                                  });
+                                  _determinePosition();
+                                } else {
+                                  widget.onChange({'lat': '-', 'long': '-'});
+                                }
+                              });
+                            },
+                          )),
+                const SizedBox(
+                  width: 5,
+                ),
+                const Text(
+                  "Nhận vị trí",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ],
             ),
             const SizedBox(
-              width: 15,
+              width: 20,
             ),
-            SizedBox(
-                height: 24.0,
-                width: 24.0,
-                child: loading
-                    ? CircularProgressIndicator()
-                    : Checkbox(
-                        checkColor: Colors.white,
-                        activeColor: Colors.greenAccent,
-                        value: checkedValue,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            checkedValue = !checkedValue;
-                            if (checkedValue) {
-                              setState(() {
-                                loading = true;
-                              });
-                              _determinePosition();
-                            } else {
-                              widget.onChange({'lat': '-', 'long': '-'});
-                            }
-                          });
-                        },
-                      )),
+            Expanded(
+                flex: 1,
+                child: Row(children: [
+                  const Text(
+                    'K.dộ:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Flexible(child: Text(widget.latLong['lat'], maxLines: 1)),
+                ])),
             const SizedBox(
               width: 5,
             ),
-            const Text(
-              "Nhận vị trí",
-              style: TextStyle(fontSize: 14),
-            ),
+            Expanded(
+                flex: 1,
+                child: Row(children: [
+                  const Text(
+                    'V.độ:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Flexible(child: Text(widget.latLong['long'], maxLines: 1)),
+                ])),
           ],
         ),
-        const SizedBox(
-          width: 20,
-        ),
-        Expanded(
-            flex: 1,
-            child: Row(children: [
-              const Text(
-                'K.dộ:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Flexible(child: Text(widget.latLong['lat'], maxLines: 1)),
-            ])),
-        const SizedBox(
-          width: 5,
-        ),
-        Expanded(
-            flex: 1,
-            child: Row(children: [
-              const Text(
-                'V.độ:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Flexible(child: Text(widget.latLong['long'], maxLines: 1)),
-            ])),
+        const SizedBox(height: 5),
+        const Text(
+          '(Bấm vào ô để thiết bị tự động nhận tọa độ)',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 12),
+        )
       ],
     );
   }

@@ -6,14 +6,12 @@ import 'dart:io';
 import '../civlization/civil_detail.dart';
 import '../component/buttoning.dart';
 import '../component/coordinate.dart';
-import './people.dart';
 import '../component/camera.dart';
-import './civil_detail.dart';
 import '../component/next.dart';
 import 'package:image_picker/image_picker.dart';
 
-class CivilView extends StatelessWidget {
-  const CivilView({Key? key}) : super(key: key);
+class SchoolView extends StatelessWidget {
+  const SchoolView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +56,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Heading(obj: {
-              'start': 'THÔNG TIN CHUNG HỘ DÂN',
-              'mid': 'Hộ số:',
+              'start': 'THÔNG TIN CHUNG',
+              'mid': 'Mã số TH:',
               'end': '001'
             }),
             CoordinateView(
@@ -69,26 +67,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         latLong = coordinate;
                       })
                     }),
-            Container(
-                width: double.infinity,
-                alignment: Alignment.centerLeft,
-                child: PeopleView(
-                    onChange: (texting) {
-                      setState(() {
-                        people[texting['type']] = texting['text'];
-                      });
-                    },
-                    obj: people)),
             const Heading(obj: {
               'title': 'THÔNG TIN CHI TIẾT',
-            }),
-            Detailing(
-                obj: const {"order": "1/5"},
-                onSelectionChanged: (selectedItem) {
-                  setState(() {});
-                }),
-            Next(onClickAction: () {
-              setState(() {});
             }),
             CameraView(
               onClickAction: (typing) {
