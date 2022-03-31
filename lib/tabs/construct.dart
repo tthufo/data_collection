@@ -96,16 +96,16 @@ class _MyHomePageState extends State<Option>
   }
 
   Future getCamera() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    var image = await ImagePicker().pickImage(source: ImageSource.camera);
     setState(() {
-      _image = image;
+      _image = image as File;
     });
   }
 
   Future getGallery() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
     setState(() {
-      _image = image;
+      _image = image as File;
     });
   }
 
