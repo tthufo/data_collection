@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
 
 class CameraView extends StatelessWidget {
+  final String title;
   final Function(String) onClickAction;
 
   const CameraView({
     Key? key,
     required this.onClickAction,
+    required this.title,
   }) : super(key: key);
 
   @override
@@ -24,13 +26,13 @@ class CameraView extends StatelessWidget {
           margin: const EdgeInsets.all(10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('Ảnh hộ gia đình',
-                  style: TextStyle(
+            children: [
+              Text(title,
+                  style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.black)),
-              Text('(Thực hiện sau khi đã xong thông tin trên)',
+              const Text('(Thực hiện sau khi đã xong thông tin trên)',
                   style: TextStyle(
                       fontSize: 13,
                       fontStyle: FontStyle.italic,

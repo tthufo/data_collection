@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import './component/buttoning.dart';
 import './civlization/civil.dart';
 import './school/school.dart';
+import './tabs/list.dart';
 
 class OptionView extends StatelessWidget {
   const OptionView({Key? key}) : super(key: key);
@@ -116,18 +117,24 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 'fontSize': 20.0
               },
             ),
-            // const SizedBox(height: 25.0),
-            // Buttoning(
-            //   title: "ỦY BAN NHÂN DÂN",
-            //   onClickAction: () => {},
-            //   obj: {
-            //     'borderColor': Colors.black,
-            //     'titleColor': Colors.black,
-            //     'width': MediaQuery.of(context).size.width * 0.6,
-            //     'height': 50.0,
-            //     'fontSize': 20.0
-            //   },
-            // ),
+            const SizedBox(height: 25.0),
+            Buttoning(
+              title: "DANH SÁCH",
+              onClickAction: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const Listing(title: 'Danh sách')))
+              },
+              obj: {
+                'borderColor': Colors.black,
+                'titleColor': Colors.black,
+                'width': MediaQuery.of(context).size.width * 0.6,
+                'height': 50.0,
+                'fontSize': 20.0
+              },
+            ),
             // const SizedBox(height: 25.0),
             // Buttoning(
             //   title: "BỆNH VIỆN",

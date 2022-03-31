@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Checker extends StatefulWidget {
-  final Function(Map<String, dynamic>) onChange;
+  final Function(String) onChange;
   final Map<String, dynamic> obj;
 
   const Checker({Key? key, required this.onChange, required this.obj})
@@ -17,6 +17,19 @@ class _MyHomePageState extends State<Checker> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      checkedValue = widget.obj["checked"] == "1";
+    });
+  }
+
+  @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.obj["checked"] != widget.obj["checked"]) {
+      setState(() {
+        checkedValue = widget.obj["checked"] == "1";
+      });
+    }
   }
 
   @override
@@ -38,6 +51,7 @@ class _MyHomePageState extends State<Checker> {
                 setState(() {
                   checkedValue = !checkedValue;
                 });
+                widget.onChange(value == true ? "1" : "0");
               },
             )),
         const SizedBox(

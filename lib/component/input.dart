@@ -13,7 +13,7 @@ class InputView extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<InputView> {
-  static final TextEditingController _textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   String name = "";
 

@@ -18,7 +18,7 @@ class CivilView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: false, // set it to false
+        resizeToAvoidBottomInset: true, // set it to false
         appBar: AppBar(
           title: const Text("Hộ dân"),
           automaticallyImplyLeading: true,
@@ -91,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               setState(() {});
             }),
             CameraView(
+              title: 'Ảnh hộ gia đình',
               onClickAction: (typing) {
                 if (typing == "1") {
                   getCamera();
@@ -138,6 +139,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return Column(
       children: [
         const Divider(
+          height: 1,
           color: Colors.black,
         ),
         Container(

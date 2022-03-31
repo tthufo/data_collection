@@ -13,7 +13,7 @@ class FieldView extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<FieldView> {
-  static final TextEditingController _textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   @override
   initState() {
@@ -58,9 +58,10 @@ class _MyHomePageState extends State<FieldView> {
               maxLength: 2,
               keyboardType: widget.obj['type'] ?? TextInputType.text,
               onChanged: (text) {
-                setState(() {
-                  widget.onChange(text);
-                });
+                // setState(() {
+                // _textController.text = text;
+                // widget.onChange(text);
+                // });
               },
               style: const TextStyle(
                 fontFamily: 'Montserrat',

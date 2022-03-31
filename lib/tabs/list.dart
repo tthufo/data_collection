@@ -7,7 +7,13 @@ class Listing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Option();
+    return Scaffold(
+        resizeToAvoidBottomInset: true, // set it to false
+        appBar: AppBar(
+          title: const Text("Danh sách"),
+          automaticallyImplyLeading: true,
+        ),
+        body: const Option());
   }
 }
 
