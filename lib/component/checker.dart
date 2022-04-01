@@ -58,7 +58,7 @@ class _MyHomePageState extends State<Checker> {
           width: 5,
         ),
         Text(
-          widget.obj['title'],
+          widget.obj['title'] ?? '',
           maxLines: 2,
           style: const TextStyle(fontSize: 14),
         ),

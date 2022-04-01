@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import './option.dart';
+import './util/storage.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -160,6 +161,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void _didRequestLogin() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const OptionView()));
+
+    // print(await Storing().getCounter('home'));
+    // Storing().updateCounter('home');
+    // print(await Storing().getCounter('home'));
     if (password.isEmpty || name.isEmpty) {
       setState(() {
         errorMessage = "Bạn cần nhập đủ thông tin xác thực";
@@ -225,6 +230,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance?.addObserver(this);
     super.initState();
     _textController.text = "";
+    Storing().initCounter();
   }
 
   @override

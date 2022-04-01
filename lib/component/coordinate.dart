@@ -21,12 +21,8 @@ class _MyHomePageState extends State<CoordinateView> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
       return Future.error('Location services are disabled.');
     }
 
@@ -34,17 +30,11 @@ class _MyHomePageState extends State<CoordinateView> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
@@ -54,7 +44,8 @@ class _MyHomePageState extends State<CoordinateView> {
 
     widget.onChange({
       'lat': currPos.latitude.toString(),
-      'long': currPos.longitude.toString()
+      'long': currPos.longitude.toString(),
+      'valid': false,
     });
 
     setState(() {
@@ -67,6 +58,19 @@ class _MyHomePageState extends State<CoordinateView> {
   @override
   void initState() {
     super.initState();
+    if (widget.latLong['lat'] != '' && widget.latLong['long'] != '') {
+      setState(() {
+        checkedValue = true;
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.latLong["valid"] != widget.latLong["valid"]) {
+      setState(() {});
+    }
   }
 
   @override
@@ -107,7 +111,8 @@ class _MyHomePageState extends State<CoordinateView> {
                                   });
                                   _determinePosition();
                                 } else {
-                                  widget.onChange({'lat': '-', 'long': '-'});
+                                  widget.onChange(
+                                      {'lat': '', 'long': '', 'valid': false});
                                 }
                               });
                             },
@@ -162,7 +167,12 @@ class _MyHomePageState extends State<CoordinateView> {
   Widget build(BuildContext context) {
     return Container(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(border: Border.all(color: Colors.redAccent)),
+        decoration: BoxDecoration(
+            border: Border.all(
+                width: 2,
+                color: widget.latLong['valid'] == false
+                    ? Colors.transparent
+                    : Colors.redAccent)),
         child: header());
   }
 }

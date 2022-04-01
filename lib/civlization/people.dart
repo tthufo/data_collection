@@ -91,7 +91,7 @@ class _MyHomePageState extends State<PeopleView> {
             ],
           ),
         ),
-        checker(),
+        // checker(),
       ],
     );
   }
@@ -135,10 +135,14 @@ class _MyHomePageState extends State<PeopleView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(0),
         width: double.infinity,
         alignment: Alignment.centerLeft,
-        decoration: BoxDecoration(border: Border.all(color: Colors.redAccent)),
+        decoration: BoxDecoration(
+            border: Border.all(
+                color: widget.obj['valid'] == false
+                    ? Colors.transparent
+                    : Colors.redAccent)),
         child: header());
   }
 }

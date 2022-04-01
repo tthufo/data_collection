@@ -8,6 +8,7 @@ import '../component/coordinate.dart';
 import '../component/camera.dart';
 import '../component/input.dart';
 import '../component/textfield.dart';
+import '../util/storage.dart';
 
 import 'package:image_picker/image_picker.dart';
 
@@ -422,7 +423,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   },
                 ),
                 GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      // print(single().task);
+                    },
                     child: Image.asset(
                       "images/img_home.png",
                       height: 40,
