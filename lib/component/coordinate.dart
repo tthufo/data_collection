@@ -14,7 +14,7 @@ class CoordinateView extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<CoordinateView> {
-  bool checkedValue = false;
+  // bool checkedValue = false;
   bool loading = false;
 
   Future<Position> _determinePosition() async {
@@ -58,19 +58,19 @@ class _MyHomePageState extends State<CoordinateView> {
   @override
   void initState() {
     super.initState();
-    if (widget.latLong['lat'] != '' && widget.latLong['long'] != '') {
-      setState(() {
-        checkedValue = true;
-      });
-    }
+    // if (widget.latLong['lat'] != '' && widget.latLong['long'] != '') {
+    //   setState(() {
+    //     checkedValue = true;
+    //   });
+    // }
   }
 
   @override
   void didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.latLong["valid"] != widget.latLong["valid"]) {
-      setState(() {});
-    }
+    // if (oldWidget.latLong["valid"] != widget.latLong["valid"]) {
+    //   setState(() {});
+    // }
   }
 
   @override
@@ -101,18 +101,23 @@ class _MyHomePageState extends State<CoordinateView> {
                         : Checkbox(
                             checkColor: Colors.white,
                             activeColor: Colors.greenAccent,
-                            value: checkedValue,
+                            value: widget.latLong['checked'],
                             onChanged: (bool? value) {
                               setState(() {
-                                checkedValue = !checkedValue;
-                                if (checkedValue) {
+                                //   widget.latLong['checked'] =
+                                //!widget.latLong['checked'];
+                                if (widget.latLong['checked']) {
                                   setState(() {
                                     loading = true;
                                   });
                                   _determinePosition();
                                 } else {
-                                  widget.onChange(
-                                      {'lat': '', 'long': '', 'valid': false});
+                                  widget.onChange({
+                                    'lat': '',
+                                    'long': '',
+                                    'valid': false,
+                                    'checked': '
+                                  });
                                 }
                               });
                             },

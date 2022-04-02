@@ -14,17 +14,17 @@ class PeopleView extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<PeopleView> {
-  bool checkedValue = false;
-  List<dynamic> listing = <dynamic>[
-    {"title": "Hộ nghèo"},
-    {"title": "Hộ cận nghèo"},
-  ];
+  // bool checkedValue = false;
+  // List<dynamic> listing = <dynamic>[
+  //   {"title": "Hộ nghèo"},
+  //   {"title": "Hộ cận nghèo"},
+  // ];
 
-  List<dynamic> listing_1 = <dynamic>[
-    {"title": "Nhà \nkiên cố"},
-    {"title": "Nhà bán \nkiên cố"},
-    {"title": "Nhà \nđơn sơ"},
-  ];
+  // List<dynamic> listing_1 = <dynamic>[
+  //   {"title": "Nhà \nkiên cố"},
+  //   {"title": "Nhà bán \nkiên cố"},
+  //   {"title": "Nhà \nđơn sơ"},
+  // ];
 
   @override
   void initState() {
@@ -50,9 +50,7 @@ class _MyHomePageState extends State<PeopleView> {
                 "type": TextInputType.number,
               },
               onChange: (texting) {
-                setState(() {
-                  widget.onChange({'text': texting, 'type': 'peopleNo'});
-                });
+                widget.onChange({'text': texting, 'type': 'peopleNo'});
               }),
         ),
         SizedBox(
@@ -70,9 +68,7 @@ class _MyHomePageState extends State<PeopleView> {
                     "type": TextInputType.number,
                   },
                   onChange: (texting) {
-                    setState(() {
-                      widget.onChange({'text': texting, 'type': 'maleNo'});
-                    });
+                    widget.onChange({'text': texting, 'type': 'maleNo'});
                   }),
               FieldView(
                   obj: {
@@ -84,9 +80,7 @@ class _MyHomePageState extends State<PeopleView> {
                     "type": TextInputType.number,
                   },
                   onChange: (texting) {
-                    setState(() {
-                      widget.onChange({'text': texting, 'type': 'femaleNo'});
-                    });
+                    widget.onChange({'text': texting, 'type': 'femaleNo'});
                   })
             ],
           ),
@@ -96,41 +90,41 @@ class _MyHomePageState extends State<PeopleView> {
     );
   }
 
-  Widget checker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Tình trạng hộ/nhà:',
-            textAlign: TextAlign.start, style: TextStyle(fontSize: 14)),
-        Row(
-            children: listing.map(
-          (item) {
-            return Checker(
-              obj: item,
-              onChange: (selectedItem) {
-                setState(() {});
-              },
-            );
-          },
-        ).toList()),
-        SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: Row(
-              children: listing_1.map(
-            (item) {
-              return Expanded(
-                  child: Checker(
-                obj: item,
-                onChange: (selectedItem) {
-                  setState(() {});
-                },
-              ));
-            },
-          ).toList()),
-        )
-      ],
-    );
-  }
+  // Widget checker() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       const Text('Tình trạng hộ/nhà:',
+  //           textAlign: TextAlign.start, style: TextStyle(fontSize: 14)),
+  //       Row(
+  //           children: listing.map(
+  //         (item) {
+  //           return Checker(
+  //             obj: item,
+  //             onChange: (selectedItem) {
+  //               setState(() {});
+  //             },
+  //           );
+  //         },
+  //       ).toList()),
+  //       SizedBox(
+  //         width: MediaQuery.of(context).size.width,
+  //         child: Row(
+  //             children: listing_1.map(
+  //           (item) {
+  //             return Expanded(
+  //                 child: Checker(
+  //               obj: item,
+  //               onChange: (selectedItem) {
+  //                 setState(() {});
+  //               },
+  //             ));
+  //           },
+  //         ).toList()),
+  //       )
+  //     ],
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

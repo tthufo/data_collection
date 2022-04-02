@@ -5,10 +5,14 @@ import '../component/checker.dart';
 class Detailing extends StatefulWidget {
   final Map<String, dynamic> obj;
 
-  final Function(Map<String, dynamic>) onSelectionChanged;
+  final Function(Map<String, dynamic>) onChange;
+  final Function(Map<String, dynamic>) onReset;
 
   const Detailing(
-      {Key? key, required this.obj, required this.onSelectionChanged})
+      {Key? key,
+      required this.obj,
+      required this.onChange,
+      required this.onReset})
       : super(key: key);
 
   @override
@@ -16,12 +20,6 @@ class Detailing extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<Detailing> {
-  String _selectedGender = '0';
-
-  bool checkedValue = false;
-
-  String birthDay = "";
-
   @override
   void initState() {
     super.initState();
@@ -38,14 +36,33 @@ class _MyHomePageState extends State<Detailing> {
       children: <Widget>[
         header(),
         mid(),
-        Row(
-          children: [
-            const Expanded(flex: 2, child: Text('')),
-            Expanded(flex: 8, child: end())
-          ],
-        )
+        AbsorbPointer(
+            absorbing: widget.obj['defected'] == "0",
+            child: Container(
+                color: widget.obj['defected'] == "0"
+                    ? const Color.fromARGB(20, 156, 156, 156)
+                    : Colors.transparent,
+                child: Row(
+                  children: [
+                    const Expanded(flex: 2, child: Text('')),
+                    Expanded(flex: 8, child: end())
+                  ],
+                )))
       ],
     );
+  }
+
+  String getYear() {
+    String birthDay = widget.obj['birthDay'] ?? "";
+    if (birthDay == "") {
+      return "";
+    }
+    var now = DateTime.now();
+    var formatter = DateFormat('yyyy');
+    String formattedDate = formatter.format(now);
+
+    return (int.parse(formattedDate) - int.parse(birthDay.split('/')[2]))
+        .toString();
   }
 
   Widget header() {
@@ -53,43 +70,45 @@ class _MyHomePageState extends State<Detailing> {
       Row(
         children: [
           Expanded(
-            child: Row(
-              children: [
-                Text(
-                  'Người thứ ${widget.obj['order'] ?? ''} :',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                GestureDetector(
-                    onTap: () {
-                      _selectDate(context);
-                    },
-                    child: Container(
-                        height: 30,
-                        width: 100,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(4.0)),
-                        child: Text(birthDay))),
-                const SizedBox(width: 10),
-                const Text('Năm sinh'),
-                const SizedBox(width: 10),
-                const Text(
-                  'tuổi',
-                  style: TextStyle(
-                      color: Colors.grey,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 12),
-                )
-              ],
-            ),
+            child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: Row(
+                  children: [
+                    Text(
+                      'Người thứ ${widget.obj['order'] ?? ''} :',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    GestureDetector(
+                        onTap: () {
+                          _selectDate(context);
+                        },
+                        child: Container(
+                            height: 30,
+                            width: 100,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(4.0)),
+                            child: Text(widget.obj['birthDay'] ?? ''))),
+                    const SizedBox(width: 10),
+                    const Text('Năm sinh'),
+                    const SizedBox(width: 10),
+                    Text(
+                      "${getYear()} tuổi",
+                      style: const TextStyle(
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 12),
+                    )
+                  ],
+                )),
           ),
         ],
       ),
@@ -108,15 +127,15 @@ class _MyHomePageState extends State<Detailing> {
             width: 5,
           ),
           Checker(
-            obj: {'title': 'Nam'},
+            obj: {'title': 'Nam', 'checked': widget.obj['male']},
             onChange: (selectedItem) {
-              setState(() {});
+              widget.onChange({'text': selectedItem, "type": 'male'});
             },
           ),
           Checker(
-            obj: {'title': 'Nữ'},
+            obj: {'title': 'Nữ', 'checked': widget.obj['female']},
             onChange: (selectedItem) {
-              setState(() {});
+              widget.onChange({'text': selectedItem, "type": 'female'});
             },
           )
         ],
@@ -136,15 +155,23 @@ class _MyHomePageState extends State<Detailing> {
             Row(
               children: [
                 Checker(
-                  obj: {'title': 'Là chủ hộ'},
+                  obj: {
+                    'title': 'Là chủ hộ',
+                    'checked': widget.obj['houseHold']
+                  },
                   onChange: (selectedItem) {
-                    setState(() {});
+                    widget
+                        .onChange({'text': selectedItem, "type": 'houseHold'});
                   },
                 ),
                 Checker(
-                  obj: {'title': 'Là phụ nữ đơn thân'},
+                  obj: {
+                    'title': 'Là phụ nữ đơn thân',
+                    'checked': widget.obj['singleMom']
+                  },
                   onChange: (selectedItem) {
-                    setState(() {});
+                    widget
+                        .onChange({'text': selectedItem, "type": 'singleMom'});
                   },
                 )
               ],
@@ -152,9 +179,15 @@ class _MyHomePageState extends State<Detailing> {
             Row(
               children: [
                 Checker(
-                  obj: {'title': 'Là người khuyết tật'},
+                  obj: {
+                    'title': 'Là người khuyết tật',
+                    'checked': widget.obj['defected']
+                  },
                   onChange: (selectedItem) {
-                    setState(() {});
+                    widget.onChange({'text': selectedItem, "type": 'defected'});
+                    if (selectedItem == "0") {
+                      widget.onReset({'type': 'defect'});
+                    }
                   },
                 )
               ],
@@ -176,21 +209,21 @@ class _MyHomePageState extends State<Detailing> {
         Row(
           children: [
             Checker(
-              obj: {'title': 'Nhìn'},
+              obj: {'title': 'Nhìn', 'checked': widget.obj['vision']},
               onChange: (selectedItem) {
-                setState(() {});
+                widget.onChange({'text': selectedItem, "type": 'vision'});
               },
             ),
             Checker(
-              obj: {'title': 'Vận động'},
+              obj: {'title': 'Vận động', 'checked': widget.obj['mobility']},
               onChange: (selectedItem) {
-                setState(() {});
+                widget.onChange({'text': selectedItem, "type": 'mobility'});
               },
             ),
             Checker(
-              obj: {'title': 'Nghe/nói'},
+              obj: {'title': 'Nghe/nói', 'checked': widget.obj['hearing']},
               onChange: (selectedItem) {
-                setState(() {});
+                widget.onChange({'text': selectedItem, "type": 'hearing'});
               },
             )
           ],
@@ -198,15 +231,15 @@ class _MyHomePageState extends State<Detailing> {
         Row(
           children: [
             Checker(
-              obj: {'title': 'Thần kinh'},
+              obj: {'title': 'Thần kinh', 'checked': widget.obj['mental']},
               onChange: (selectedItem) {
-                setState(() {});
+                widget.onChange({'text': selectedItem, "type": 'mental'});
               },
             ),
             Checker(
-              obj: {'title': 'Khác'},
+              obj: {'title': 'Khác', 'checked': widget.obj['other']},
               onChange: (selectedItem) {
-                setState(() {});
+                widget.onChange({'text': selectedItem, "type": 'other'});
               },
             )
           ],
@@ -226,7 +259,8 @@ class _MyHomePageState extends State<Detailing> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
-        birthDay = DateFormat('dd/MM/yyyy').format(selectedDate);
+        String birthDay = DateFormat('dd/MM/yyyy').format(selectedDate);
+        widget.onChange({'text': birthDay, "type": 'birthDay'});
       });
     }
   }
@@ -234,10 +268,14 @@ class _MyHomePageState extends State<Detailing> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(0),
         width: double.infinity,
         alignment: Alignment.centerLeft,
-        decoration: BoxDecoration(border: Border.all(color: Colors.redAccent)),
+        decoration: BoxDecoration(
+            border: Border.all(
+                color: widget.obj['valid'] == false
+                    ? Colors.transparent
+                    : Colors.redAccent)),
         child: body());
   }
 }

@@ -38,9 +38,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   String unitNo = "";
 
+  int position = 0;
+
   Map<String, dynamic> latLong = {
     'lat': '',
     'long': '',
+    'checked': false,
     'valid': false,
   };
 
@@ -77,9 +80,137 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     },
   ];
 
+  List<dynamic> detailList = <dynamic>[
+    {
+      'birthDay': '',
+      "order": "1/x",
+      'valid': false,
+      'male': '0',
+      'female': '0',
+      'houseHold': '0',
+      'singleMom': '0',
+      'defected': '0',
+      'vision': '0',
+      'mobility': '0',
+      'hearing': '0',
+      'mental': '0',
+      'other': '0',
+    },
+  ];
+
+  List<dynamic> defectes = <dynamic>[
+    'vision',
+    'mobility',
+    'hearing',
+    'mental',
+    'other',
+  ];
+
   late File _image;
 
   final picker = ImagePicker();
+
+  bool get _validCoor {
+    return latLong['lat'] == "" || latLong['long'] == "";
+  }
+
+  bool get _validDetail {
+    return detailList[position]['birthDay'] == "" ||
+        (detailList[position]['male'] == "0" &&
+            detailList[position]['female'] == "0");
+  }
+
+  _resetDetailList() {
+    setState(() {
+      detailList.clear();
+      detailList = [
+        {
+          'birthDay': '',
+          "order": "1/${people['peopleNo']}",
+          'valid': false,
+          'male': '0',
+          'female': '0',
+          'houseHold': '0',
+          'singleMom': '0',
+          'defected': '0',
+          'vision': '0',
+          'mobility': '0',
+          'hearing': '0',
+          'mental': '0',
+          'other': '0',
+        }
+      ];
+    });
+  }
+
+  _resetAll() {
+    setState(() {
+      latLong = {
+        'lat': '',
+        'long': '',
+        'checked': false,
+        'valid': false,
+      };
+
+      people = {
+        'peopleNo': '',
+        'maleNo': '',
+        'femaleNo': '',
+        'valid': false,
+      };
+
+      condition_1 = [
+        {'key': 'tinhtrang_id', 'id': 0, "title": "Hộ nghèo", 'checked': '0'},
+        {
+          'key': 'tinhtrang_id',
+          'id': 1,
+          "title": "Hộ cận nghèo",
+          'checked': '0'
+        },
+      ];
+
+      condition_2 = [
+        {
+          'key': 'tinhtrang_congtrinh_id',
+          'id': 0,
+          "title": "Nhà \nkiên cố",
+          'checked': '0'
+        },
+        {
+          'key': 'tinhtrang_congtrinh_id',
+          'id': 1,
+          "title": "Nhà bán \nkiên cố",
+          'checked': '0'
+        },
+        {
+          'key': 'tinhtrang_congtrinh_id',
+          'id': 2,
+          "title": "Nhà \nđơn sơ",
+          'checked': '0'
+        },
+      ];
+
+      detailList = [
+        {
+          'birthDay': '',
+          "order": "1/x",
+          'valid': false,
+          'male': '0',
+          'female': '0',
+          'houseHold': '0',
+          'singleMom': '0',
+          'defected': '0',
+          'vision': '0',
+          'mobility': '0',
+          'hearing': '0',
+          'mental': '0',
+          'other': '0',
+        },
+      ];
+
+      // _image.delete();
+    });
+  }
 
   Widget body() {
     return Padding(
@@ -101,50 +232,106 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       })
                     }),
             AbsorbPointer(
-                absorbing: latLong['lat'] == "" || latLong['long'] == "",
+                absorbing: _validCoor,
                 child: Container(
-                    color: latLong['lat'] == "" || latLong['long'] == ""
+                    color: _validCoor
                         ? const Color.fromARGB(20, 156, 156, 156)
                         : Colors.transparent,
                     width: double.infinity,
                     alignment: Alignment.centerLeft,
                     child: PeopleView(
                         onChange: (texting) {
+                          String typing = texting['type'];
                           setState(() {
-                            people[texting['type']] = texting['text'];
+                            people[typing] = texting['text'];
                           });
+                          if (typing == "peopleNo") {
+                            _resetDetailList();
+                          }
                         },
                         obj: people))),
             AbsorbPointer(
-                absorbing: latLong['lat'] == "" || latLong['long'] == "",
+                absorbing: _validCoor,
                 child: Container(
-                  color: latLong['lat'] == "" || latLong['long'] == ""
+                  color: _validCoor
                       ? const Color.fromARGB(20, 156, 156, 156)
                       : Colors.transparent,
-                  // margin: const EdgeInsets.all(0),
                   child: checker(),
                 )),
             const Heading(obj: {
               'title': 'THÔNG TIN CHI TIẾT',
             }),
-            Detailing(
-                obj: const {"order": "1/5"},
-                onSelectionChanged: (selectedItem) {
-                  setState(() {});
-                }),
-            Next(onClickAction: () {
-              setState(() {});
-            }),
-            CameraView(
-              title: 'Ảnh hộ gia đình',
-              onClickAction: (typing) {
-                if (typing == "1") {
-                  getCamera();
-                } else {
-                  getGallery();
-                }
-              },
-            ),
+            AbsorbPointer(
+                absorbing: _validCoor || people['peopleNo'] == "",
+                child: Container(
+                    // padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    color: _validCoor || people['peopleNo'] == ""
+                        ? const Color.fromARGB(20, 156, 156, 156)
+                        : Colors.transparent,
+                    child: Detailing(
+                        obj: detailList[position],
+                        onReset: (reset) {
+                          if (reset['type'] == 'defect') {
+                            setState(() {
+                              for (String key in defectes) {
+                                detailList[position][key] = "0";
+                              }
+                            });
+                          }
+                        },
+                        onChange: (texting) {
+                          setState(() {
+                            String typing = texting['type'];
+                            if (typing == "male" || typing == "female") {
+                              _resetGender(typing);
+                            }
+                            if (defectes.contains(typing)) {
+                              _resetDefect(typing);
+                            } else {
+                              detailList[position][typing] = texting['text'];
+                            }
+                          });
+                        }))),
+            AbsorbPointer(
+                absorbing:
+                    _validCoor || people['peopleNo'] == "" || _validDetail,
+                child: Container(
+                    width: double.infinity,
+                    height: people['peopleNo'] != "" &&
+                            int.parse(people['peopleNo']) != 0 &&
+                            int.parse(people['peopleNo']) - 1 > position
+                        ? 80
+                        : 0,
+                    color:
+                        _validCoor || people['peopleNo'] == "" || _validDetail
+                            ? const Color.fromARGB(20, 156, 156, 156)
+                            : Colors.transparent,
+                    child: Next(onClickAction: () {
+                      // setState(() {});
+                    }))),
+            AbsorbPointer(
+                absorbing: _validCoor ||
+                    people['peopleNo'] == "" ||
+                    _validDetail ||
+                    (position < int.parse(people['peopleNo']) - 1),
+                child: Container(
+                    width: double.infinity,
+                    color: _validCoor ||
+                            people['peopleNo'] == "" ||
+                            _validDetail ||
+                            (position < int.parse(people['peopleNo']) - 1)
+                        ? const Color.fromARGB(20, 156, 156, 156)
+                        : Colors.transparent,
+                    child: CameraView(
+                      title: 'Ảnh hộ gia đình',
+                      onClickAction: (typing) {
+                        if (typing == "1") {
+                          getCamera();
+                        } else {
+                          getGallery();
+                        }
+                      },
+                    ))),
           ],
         ));
   }
@@ -159,6 +346,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       } else {
         for (var con in condition) {
           con['checked'] = "0";
+        }
+      }
+    });
+  }
+
+  _resetGender(typing) {
+    setState(() {
+      if (detailList[position][typing] == "0") {
+        detailList[position]['male'] = '0';
+        detailList[position]['female'] = '0';
+        detailList[position][typing] = "1";
+      } else {
+        detailList[position]['male'] = '0';
+        detailList[position]['female'] = '0';
+      }
+    });
+  }
+
+  _resetDefect(typing) {
+    setState(() {
+      if (detailList[position][typing] == "0") {
+        for (String key in defectes) {
+          detailList[position][key] = "0";
+        }
+        detailList[position][typing] = "1";
+      } else {
+        for (String key in defectes) {
+          detailList[position][key] = "0";
         }
       }
     });
@@ -268,7 +483,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: [
                 Buttoning(
                   title: "Xóa",
-                  onClickAction: () => {print(condition_1)},
+                  onClickAction: () => {_resetAll()},
                   obj: const {
                     'width': 60.0,
                   },
@@ -284,7 +499,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   },
                 ),
                 GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                     child: Image.asset(
                       "images/img_home.png",
                       height: 40,
@@ -300,14 +517,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: Column(
-      children: [
-        Expanded(
-            flex: 9,
-            child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(), child: body())),
-        footer(),
-      ],
-    ));
+        child: Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                Expanded(
+                    flex: 9,
+                    child: SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(), child: body())),
+                footer(),
+              ],
+            )));
   }
 }

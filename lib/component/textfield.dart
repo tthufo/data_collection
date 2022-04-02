@@ -58,10 +58,7 @@ class _MyHomePageState extends State<FieldView> {
               maxLength: 2,
               keyboardType: widget.obj['type'] ?? TextInputType.text,
               onChanged: (text) {
-                // setState(() {
-                // _textController.text = text;
-                // widget.onChange(text);
-                // });
+                widget.onChange(text);
               },
               style: const TextStyle(
                 fontFamily: 'Montserrat',
