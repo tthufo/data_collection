@@ -45,6 +45,7 @@ class _MyHomePageState extends State<CoordinateView> {
     widget.onChange({
       'lat': currPos.latitude.toString(),
       'long': currPos.longitude.toString(),
+      'checked': true,
       'valid': false,
     });
 
@@ -58,19 +59,11 @@ class _MyHomePageState extends State<CoordinateView> {
   @override
   void initState() {
     super.initState();
-    // if (widget.latLong['lat'] != '' && widget.latLong['long'] != '') {
-    //   setState(() {
-    //     checkedValue = true;
-    //   });
-    // }
   }
 
   @override
   void didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // if (oldWidget.latLong["valid"] != widget.latLong["valid"]) {
-    //   setState(() {});
-    // }
   }
 
   @override
@@ -103,23 +96,19 @@ class _MyHomePageState extends State<CoordinateView> {
                             activeColor: Colors.greenAccent,
                             value: widget.latLong['checked'],
                             onChanged: (bool? value) {
-                              setState(() {
-                                //   widget.latLong['checked'] =
-                                //!widget.latLong['checked'];
-                                if (widget.latLong['checked']) {
-                                  setState(() {
-                                    loading = true;
-                                  });
-                                  _determinePosition();
-                                } else {
-                                  widget.onChange({
-                                    'lat': '',
-                                    'long': '',
-                                    'valid': false,
-                                    'checked': '
-                                  });
-                                }
-                              });
+                              if (!widget.latLong['checked']) {
+                                setState(() {
+                                  loading = true;
+                                });
+                                _determinePosition();
+                              } else {
+                                widget.onChange({
+                                  'lat': '',
+                                  'long': '',
+                                  'valid': false,
+                                  'checked': false,
+                                });
+                              }
                             },
                           )),
                 const SizedBox(

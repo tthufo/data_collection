@@ -32,10 +32,10 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyCivilPageState createState() => _MyCivilPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   String unitNo = "";
 
   int position = 0;
@@ -106,9 +106,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     'other',
   ];
 
-  late File _image;
+  List<dynamic> fieldView = <dynamic>[];
 
-  final picker = ImagePicker();
+  late File _image;
 
   bool get _validCoor {
     return latLong['lat'] == "" || latLong['long'] == "";
@@ -190,10 +190,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         },
       ];
 
+      position = 0;
+
       detailList = [
         {
           'birthDay': '',
-          "order": "1/x",
+          "order": "${position + 1}/x",
           'valid': false,
           'male': '0',
           'female': '0',
@@ -207,8 +209,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           'other': '0',
         },
       ];
+    });
 
-      // _image.delete();
+    for (TextEditingController text in fieldView) {
+      text.clear();
+    }
+  }
+
+  _goNext() {
+    setState(() {
+      position += 1;
+
+      detailList.add(
+        {
+          'birthDay': '',
+          "order": "${position + 1}/${people['peopleNo']}",
+          'valid': false,
+          'male': '0',
+          'female': '0',
+          'houseHold': '0',
+          'singleMom': '0',
+          'defected': '0',
+          'vision': '0',
+          'mobility': '0',
+          'hearing': '0',
+          'mental': '0',
+          'other': '0',
+        },
+      );
     });
   }
 
@@ -242,9 +270,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     child: PeopleView(
                         onChange: (texting) {
                           String typing = texting['type'];
-                          setState(() {
-                            people[typing] = texting['text'];
-                          });
+                          if (typing == 'fieldView') {
+                            fieldView = texting['text'];
+                          } else {
+                            setState(() {
+                              people[typing] = texting['text'];
+                            });
+                          }
                           if (typing == "peopleNo") {
                             _resetDetailList();
                           }
@@ -264,7 +296,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             AbsorbPointer(
                 absorbing: _validCoor || people['peopleNo'] == "",
                 child: Container(
-                    // padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                     color: _validCoor || people['peopleNo'] == ""
                         ? const Color.fromARGB(20, 156, 156, 156)
                         : Colors.transparent,
@@ -307,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             ? const Color.fromARGB(20, 156, 156, 156)
                             : Colors.transparent,
                     child: Next(onClickAction: () {
-                      // setState(() {});
+                      _goNext();
                     }))),
             AbsorbPointer(
                 absorbing: _validCoor ||

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../component/textfield.dart';
-import '../component/checker.dart';
 
 class PeopleView extends StatefulWidget {
   final Function(Map<String, dynamic>) onChange;
@@ -10,31 +9,23 @@ class PeopleView extends StatefulWidget {
       : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyPeoplePageState createState() => _MyPeoplePageState();
 }
 
-class _MyHomePageState extends State<PeopleView> {
-  // bool checkedValue = false;
-  // List<dynamic> listing = <dynamic>[
-  //   {"title": "Hộ nghèo"},
-  //   {"title": "Hộ cận nghèo"},
-  // ];
-
-  // List<dynamic> listing_1 = <dynamic>[
-  //   {"title": "Nhà \nkiên cố"},
-  //   {"title": "Nhà bán \nkiên cố"},
-  //   {"title": "Nhà \nđơn sơ"},
-  // ];
-
+class _MyPeoplePageState extends State<PeopleView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback(
+        (_) => widget.onChange({'type': 'fieldView', 'text': listText}));
   }
 
   @override
   void dispose() {
     super.dispose();
   }
+
+  List<dynamic> listText = <dynamic>[];
 
   Column header() {
     return Column(
@@ -50,7 +41,11 @@ class _MyHomePageState extends State<PeopleView> {
                 "type": TextInputType.number,
               },
               onChange: (texting) {
-                widget.onChange({'text': texting, 'type': 'peopleNo'});
+                if (texting.runtimeType != String) {
+                  listText.add(texting);
+                } else {
+                  widget.onChange({'text': texting, 'type': 'peopleNo'});
+                }
               }),
         ),
         SizedBox(
@@ -68,7 +63,11 @@ class _MyHomePageState extends State<PeopleView> {
                     "type": TextInputType.number,
                   },
                   onChange: (texting) {
-                    widget.onChange({'text': texting, 'type': 'maleNo'});
+                    if (texting.runtimeType != String) {
+                      listText.add(texting);
+                    } else {
+                      widget.onChange({'text': texting, 'type': 'maleNo'});
+                    }
                   }),
               FieldView(
                   obj: {
@@ -80,8 +79,22 @@ class _MyHomePageState extends State<PeopleView> {
                     "type": TextInputType.number,
                   },
                   onChange: (texting) {
-                    widget.onChange({'text': texting, 'type': 'femaleNo'});
-                  })
+                    if (texting.runtimeType != String) {
+                      listText.add(texting);
+                    } else {
+                      widget.onChange({'text': texting, 'type': 'femaleNo'});
+                    }
+                  }),
+              // Buttoning(
+              //   title: "Nhận tọa độ",
+              //   onClickAction: () => {
+              //     for (TextEditingController text in listText) {text.clear()}
+              //   },
+              //   obj: const {
+              //     'borderColor': Colors.greenAccent,
+              //     'titleColor': Colors.black,
+              //   },
+              // ),
             ],
           ),
         ),

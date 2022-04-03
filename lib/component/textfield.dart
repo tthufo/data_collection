@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class FieldView extends StatefulWidget {
-  final Function(String) onChange;
+  final Function(dynamic) onChange;
 
   final Map<String, dynamic> obj;
 
@@ -19,11 +19,25 @@ class _MyHomePageState extends State<FieldView> {
   initState() {
     super.initState();
     _textController.text = widget.obj["text"];
+    widget.onChange(_textController);
+  }
+
+  @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.obj["text"] != widget.obj["text"]) {
+      // _textController.text = widget.obj["text"];
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
+    _textController.dispose();
+  }
+
+  _resetText() {
+    _textController.clear();
   }
 
   Widget inputField() {
@@ -31,7 +45,7 @@ class _MyHomePageState extends State<FieldView> {
       mainAxisSize: MainAxisSize.min,
       children: [
         widget.obj['pre'] != null
-            ? Text(widget.obj['pre'],
+            ? Text(widget.obj['pre'] ?? '',
                 style: TextStyle(
                   fontSize: 14,
                   fontStyle: FontStyle.italic,
@@ -43,7 +57,7 @@ class _MyHomePageState extends State<FieldView> {
         const SizedBox(
           width: 10,
         ),
-        Text(widget.obj['start'],
+        Text(widget.obj['start'] ?? '',
             style: const TextStyle(
               fontSize: 14,
             )),
@@ -55,7 +69,7 @@ class _MyHomePageState extends State<FieldView> {
             child: TextField(
               controller: _textController,
               obscureText: false,
-              maxLength: 2,
+              maxLength: widget.obj['limit'] ?? 2,
               keyboardType: widget.obj['type'] ?? TextInputType.text,
               onChanged: (text) {
                 widget.onChange(text);
@@ -82,7 +96,7 @@ class _MyHomePageState extends State<FieldView> {
               ),
             )),
         widget.obj['end'] != null
-            ? Text(widget.obj['end'],
+            ? Text(widget.obj['end'] ?? '',
                 style: const TextStyle(
                     fontSize: 13,
                     fontStyle: FontStyle.italic,

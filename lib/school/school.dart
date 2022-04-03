@@ -9,7 +9,6 @@ import '../component/camera.dart';
 import '../component/input.dart';
 import '../component/textfield.dart';
 import '../util/storage.dart';
-
 import 'package:image_picker/image_picker.dart';
 
 class SchoolView extends StatelessWidget {
@@ -35,20 +34,64 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+  String unitNo = "";
+
   Map<String, dynamic> latLong = {
-    'lat': '-',
-    'long': '-',
+    'lat': '',
+    'long': '',
+    'checked': false,
+    'valid': false,
   };
 
-  Map<String, dynamic> level_1 = {
+  Map<String, dynamic> schoolDetail = {
     'room': '',
     'pupil': '',
-    'femaleNo': '',
+    'pupilMale': '',
+    'pupilFemale': '',
+    'teacher': '',
+    'teacherMale': '',
+    'teacherFemale': '',
+    'peopleEvac': '',
+    'peopleEvacMale': '',
+    'peopleEvacFemale': '',
   };
+
+  Map<String, dynamic> gradeObj = {
+    'lvl1': '0',
+    'lvl2': '0',
+    'lvl3': '0',
+    'lvl4': '0',
+    'lvl5': '0',
+    'lvl6': '0',
+    'lvl7': '0',
+    'school': '',
+    'con1': '0',
+    'con2': '0',
+    'con3': '0',
+    'valid': false,
+  };
+
+  var gradeKey = [
+    "lvl1",
+    "lvl2",
+    "lvl3",
+    "lvl4",
+    "lvl5",
+    "lvl6",
+    "lvl7",
+  ];
+  var conditionKey = ["con1", "con2", "con3"];
+
+  List<dynamic> listText = <dynamic>[];
 
   late File _image;
 
-  final picker = ImagePicker();
+  void getCounter() async {
+    int? counter = await Storing().getCounter('school');
+    setState(() {
+      unitNo = counter.toString();
+    });
+  }
 
   Future getCamera() async {
     var image = await ImagePicker().pickImage(source: ImageSource.camera);
@@ -64,6 +107,74 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
+  bool get _validCoor {
+    return latLong['lat'] == "" || latLong['long'] == "";
+  }
+
+  bool get _validHeader {
+    var gradeList = gradeKey.where((item) {
+      return gradeObj[item] == "1";
+    });
+    var conditionList = conditionKey.where((item) {
+      return gradeObj[item] == "1";
+    });
+    return gradeList.isEmpty ||
+        conditionList.isEmpty ||
+        gradeObj['school'] == '';
+  }
+
+  bool get _validDetail {
+    for (var key in schoolDetail.keys) {
+      if (schoolDetail[key] == "") {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  _resetAll() {
+    setState(() {
+      latLong = {
+        'lat': '',
+        'long': '',
+        'checked': false,
+        'valid': false,
+      };
+
+      schoolDetail = {
+        'room': '',
+        'pupil': '',
+        'pupilMale': '',
+        'pupilFemale': '',
+        'teacher': '',
+        'teacherMale': '',
+        'teacherFemale': '',
+        'peopleEvac': '',
+        'peopleEvacMale': '',
+        'peopleEvacFemale': '',
+      };
+
+      gradeObj = {
+        'lvl1': '0',
+        'lvl2': '0',
+        'lvl3': '0',
+        'lvl4': '0',
+        'lvl5': '0',
+        'lvl6': '0',
+        'lvl7': '0',
+        'school': '',
+        'con1': '0',
+        'con2': '0',
+        'con3': '0',
+        'valid': false,
+      };
+    });
+
+    for (TextEditingController text in listText) {
+      text.clear();
+    }
+  }
+
   Widget body() {
     return Padding(
         padding: const EdgeInsets.all(0.0),
@@ -71,10 +182,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Heading(obj: {
+            Heading(obj: {
               'start': 'THÔNG TIN CHUNG',
               'mid': 'Mã số TH:',
-              'end': '001'
+              'end': unitNo
             }),
             CoordinateView(
                 latLong: latLong,
@@ -83,47 +194,67 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         latLong = coordinate;
                       })
                     }),
-            level(),
-            school(),
-            condition(),
+            AbsorbPointer(
+                absorbing: _validCoor,
+                child: Container(
+                    decoration: BoxDecoration(
+                        color: _validCoor
+                            ? const Color.fromARGB(20, 156, 156, 156)
+                            : Colors.transparent,
+                        border: Border.all(
+                            color: gradeObj['valid'] == false
+                                ? Colors.transparent
+                                : Colors.redAccent)),
+                    child: Column(children: [
+                      level(),
+                      school(),
+                      condition(),
+                    ]))),
             const Heading(obj: {
               'title': 'THÔNG TIN CHI TIẾT',
             }),
-            detail(),
-            CameraView(
-              title: 'Ảnh trường học',
-              onClickAction: (typing) {
-                if (typing == "1") {
-                  getCamera();
-                } else {
-                  getGallery();
-                }
-              },
-            ),
+            AbsorbPointer(
+                absorbing: _validCoor || _validHeader,
+                child: Container(
+                    color: _validCoor
+                        ? const Color.fromARGB(20, 156, 156, 156)
+                        : Colors.transparent,
+                    child: detail())),
+            AbsorbPointer(
+                absorbing: _validCoor || _validHeader || _validDetail,
+                child: Container(
+                    color: _validCoor
+                        ? const Color.fromARGB(20, 156, 156, 156)
+                        : Colors.transparent,
+                    child: CameraView(
+                      title: 'Ảnh trường học',
+                      onClickAction: (typing) {
+                        if (typing == "1") {
+                          getCamera();
+                        } else {
+                          getGallery();
+                        }
+                      },
+                    ))),
           ],
         ));
   }
 
-  Map<String, dynamic> gradeObj = {
-    'lvl1': '0',
-    'lvl2': '0',
-    'lvl3': '0',
-    'lvl4': '0',
-    'lvl5': '0',
-    'lvl6': '0',
-    'lvl7': '0',
-  };
-
-  _resetGrade(typing) {
+  _resetGrade(typing, isGrade) {
+    var array = isGrade ? gradeKey : conditionKey;
     setState(() {
       if (gradeObj[typing] == "0") {
         for (var v in gradeObj.keys) {
-          gradeObj[v] = "0";
+          if (array.contains(v)) {
+            gradeObj[v] = "0";
+          }
         }
         gradeObj[typing] = "1";
       } else {
         for (var v in gradeObj.keys) {
-          gradeObj[v] = "0";
+          if (array.contains(v)) {
+            gradeObj[v] = "0";
+          }
         }
       }
     });
@@ -131,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Widget level() {
     return Padding(
-        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
         child: Column(
           children: [
             Row(
@@ -140,22 +271,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 const SizedBox(width: 5),
                 Checker(
                     onChange: (typing) {
-                      _resetGrade("lvl1");
+                      _resetGrade("lvl1", true);
                     },
                     obj: {"title": "M.Giáo", "checked": gradeObj["lvl1"]}),
                 Checker(
                     onChange: (typing) {
-                      _resetGrade("lvl2");
+                      _resetGrade("lvl2", true);
                     },
                     obj: {"title": "Tiểu \nhọc", "checked": gradeObj["lvl2"]}),
                 Checker(
                     onChange: (typing) {
-                      _resetGrade("lvl3");
+                      _resetGrade("lvl3", true);
                     },
                     obj: {"title": "PTCS", "checked": gradeObj["lvl3"]}),
                 Checker(
                     onChange: (typing) {
-                      _resetGrade("lvl4");
+                      _resetGrade("lvl4", true);
                     },
                     obj: {"title": "PTTH", "checked": gradeObj["lvl4"]})
               ],
@@ -169,17 +300,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 const SizedBox(width: 5),
                 Checker(
                     onChange: (typing) {
-                      _resetGrade("lvl5");
+                      _resetGrade("lvl5", true);
                     },
                     obj: {"title": "Đại học", "checked": gradeObj["lvl5"]}),
                 Checker(
                     onChange: (typing) {
-                      _resetGrade("lvl6");
+                      _resetGrade("lvl6", true);
                     },
                     obj: {"title": "Cao đẳng", "checked": gradeObj["lvl6"]}),
                 Checker(
                     onChange: (typing) {
-                      _resetGrade("lvl7");
+                      _resetGrade("lvl7", true);
                     },
                     obj: {"title": "Dạy nghề", "checked": gradeObj["lvl7"]}),
               ],
@@ -201,15 +332,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             const SizedBox(height: 5),
             Row(
               children: [
-                const SizedBox(width: 40),
+                const SizedBox(width: 20),
                 SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.6,
-                    child: InputView(
-                        obj: const {"hintText": ""},
-                        onChange: (selectedItem) {
-                          setState(() {
-                            // obj = selectedItem;
-                          });
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    child: FieldView(
+                        obj: {
+                          "limit": 100,
+                          "width": MediaQuery.of(context).size.width * 0.6,
+                        },
+                        onChange: (texting) {
+                          if (texting.runtimeType != String) {
+                            listText.add(texting);
+                          } else {
+                            setState(() {
+                              gradeObj['school'] = texting;
+                            });
+                          }
                         })),
               ],
             )
@@ -234,10 +372,24 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   style: TextStyle(color: Colors.transparent),
                 ),
                 const SizedBox(width: 5),
-                Checker(onChange: (typing) {}, obj: {"title": "Nh.kiên cố"}),
                 Checker(
-                    onChange: (typing) {}, obj: {"title": "Nh.bán \nkiên cố"}),
-                Checker(onChange: (typing) {}, obj: {"title": "Nh.đơn sơ"}),
+                    onChange: (typing) {
+                      _resetGrade("con1", false);
+                    },
+                    obj: {"title": "Nh.kiên cố", "checked": gradeObj["con1"]}),
+                Checker(
+                    onChange: (typing) {
+                      _resetGrade("con2", false);
+                    },
+                    obj: {
+                      "title": "Nh.bán \nkiên cố",
+                      "checked": gradeObj["con2"]
+                    }),
+                Checker(
+                    onChange: (typing) {
+                      _resetGrade("con3", false);
+                    },
+                    obj: {"title": "Nh.đơn sơ", "checked": gradeObj["con3"]}),
               ],
             )
           ],
@@ -250,13 +402,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         FieldView(
             obj: {
               "start": "Số phòng học:",
-              "text": level_1['room'],
+              "text": schoolDetail['room'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {
-                level_1['room'] = texting;
-              });
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['room'] = texting;
+                });
+              }
             })
       ]),
       Row(children: [
@@ -264,13 +420,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             obj: {
               "start": "Số học sinh:   ",
               "end": "người",
-              "text": level_1['pupil'],
+              "text": schoolDetail['pupil'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {
-                level_1['pupil'] = texting;
-              });
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['pupil'] = texting;
+                });
+              }
             })
       ]),
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -280,22 +440,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               "pre": "Trong đó:",
               "start": "Nam",
               "end": "người",
-              "text": "",
+              "text": schoolDetail['pupilMale'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {});
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['pupilMale'] = texting;
+                });
+              }
             }),
         FieldView(
             obj: {
               "width": 60.0,
               "start": "Nữ",
               "end": "người",
-              "text": "",
+              "text": schoolDetail['pupilFemale'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {});
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['pupilFemale'] = texting;
+                });
+              }
             })
       ]),
       Row(children: [
@@ -303,11 +475,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             obj: {
               "start": "Số GV/C.bộ:   ",
               "end": "người",
-              "text": "",
+              "text": schoolDetail['teacher'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {});
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['teacher'] = texting;
+                });
+              }
             })
       ]),
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -317,22 +495,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               "pre": "Trong đó:",
               "start": "Nam",
               "end": "người",
-              "text": "",
+              "text": schoolDetail['teacherMale'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {});
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['teacherMale'] = texting;
+                });
+              }
             }),
         FieldView(
             obj: {
               "width": 60.0,
               "start": "Nữ",
               "end": "người",
-              "text": "",
+              "text": schoolDetail['teacherFemale'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {});
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['teacherFemale'] = texting;
+                });
+              }
             })
       ]),
       Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
@@ -343,11 +533,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             obj: {
               "start": "Tổng số:         ",
               "end": "người",
-              "text": "",
+              "text": schoolDetail['peopleEvac'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {});
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['peopleEvac'] = texting;
+                });
+              }
             })
       ]),
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -357,22 +553,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               "pre": "Trong đó:",
               "start": "Nam",
               "end": "người",
-              "text": "",
+              "text": schoolDetail['peopleEvacMale'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {});
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['peopleEvacMale'] = texting;
+                });
+              }
             }),
         FieldView(
             obj: {
               "width": 60.0,
               "start": "Nữ",
               "end": "người",
-              "text": "",
+              "text": schoolDetail['peopleEvacFemale'],
               "type": TextInputType.number,
             },
             onChange: (texting) {
-              setState(() {});
+              if (texting.runtimeType != String) {
+                listText.add(texting);
+              } else {
+                setState(() {
+                  schoolDetail['peopleEvacFemale'] = texting;
+                });
+              }
             })
       ]),
     ]);
@@ -382,6 +590,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   initState() {
     WidgetsBinding.instance?.addObserver(this);
     super.initState();
+    getCounter();
   }
 
   @override
@@ -410,7 +619,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: [
                 Buttoning(
                   title: "Xóa",
-                  onClickAction: () => {},
+                  onClickAction: () => {_resetAll()},
                   obj: const {
                     'width': 60.0,
                   },
@@ -440,14 +649,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-            flex: 9,
-            child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(), child: body())),
-        footer(),
-      ],
-    );
+    return Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            Expanded(
+                flex: 9,
+                child: SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(), child: body())),
+            footer(),
+          ],
+        ));
   }
 }

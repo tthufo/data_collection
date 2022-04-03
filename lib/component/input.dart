@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class InputView extends StatefulWidget {
-  final Function(String) onChange;
+  final Function(dynamic) onChange;
 
   final Map<String, dynamic> obj;
 
@@ -15,17 +15,19 @@ class InputView extends StatefulWidget {
 class _MyHomePageState extends State<InputView> {
   final TextEditingController _textController = TextEditingController();
 
-  String name = "";
+  // String name = "";
 
   @override
   initState() {
     super.initState();
-    _textController.text = "";
+    _textController.text = widget.obj["text"];
+    widget.onChange(_textController);
   }
 
   @override
   void dispose() {
     super.dispose();
+    _textController.dispose();
   }
 
   Widget inputField() {
@@ -35,10 +37,7 @@ class _MyHomePageState extends State<InputView> {
           obscureText: false,
           keyboardType: widget.obj['type'] ?? TextInputType.text,
           onChanged: (text) {
-            setState(() {
-              name = text;
-              widget.onChange(text);
-            });
+            widget.onChange(text);
           },
           style: const TextStyle(
             fontFamily: 'Montserrat',

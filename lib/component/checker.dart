@@ -18,7 +18,8 @@ class _MyHomePageState extends State<Checker> {
   void initState() {
     super.initState();
     setState(() {
-      checkedValue = widget.obj["checked"] == "1";
+      checkedValue =
+          widget.obj["checked"] == null ? false : widget.obj["checked"] == "1";
     });
   }
 
