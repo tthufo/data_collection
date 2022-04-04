@@ -467,7 +467,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void getCounter() async {
-    int? counter = await Storing().getCounter('home');
+    int? counter = await Storing().getCounter('homeIndex');
     setState(() {
       unitNo = counter.toString();
     });
@@ -522,16 +522,18 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                 Buttoning(
                   title: "H.Thành/Lưu",
                   onClickAction: () async => {
-                    validate()
-                    // await Storing().updateCounter('home'), getCounter()
+                    validate(),
+                    Storing().addData({'id': 11, 'data': latLong}, 'civil')
+                    // await Storing().updateCounter('homeIndex'), getCounter()
                   },
                   obj: const {
                     'width': 120.0,
                   },
                 ),
                 GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
+                    onTap: () async {
+                      // Navigator.pop(context);
+                      print(await Storing().getAllData('civil'));
                     },
                     child: Image.asset(
                       "images/img_home.png",

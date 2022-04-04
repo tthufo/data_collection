@@ -4,8 +4,6 @@ import 'dart:convert';
 class Storing {
   static Storing? _instance;
 
-  String task = "ablaf";
-
   Storing._internal();
 
   factory Storing() {
@@ -15,11 +13,11 @@ class Storing {
 
   Future<void> initCounter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getInt('home') == null) {
-      await prefs.setInt('home', 1);
+    if (prefs.getInt('homeIndex') == null) {
+      await prefs.setInt('homeIndex', 1);
     }
-    if (prefs.getInt('school') == null) {
-      await prefs.setInt('school', 1);
+    if (prefs.getInt('schoolIndex') == null) {
+      await prefs.setInt('schoolIndex', 1);
     }
   }
 
@@ -34,8 +32,33 @@ class Storing {
     await prefs.setInt(name, counter! + 1);
   }
 
-  _addData(object, name) async {
+  void addData(object, name) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString(name, jsonEncode(object));
+    if (prefs.getStringList(name) == null) {
+      var list = [jsonEncode(object)];
+      await prefs.setStringList(name, list);
+    } else {
+      var list = prefs.getStringList(name);
+      list?.add(jsonEncode(object));
+      await prefs.setStringList(name, list!);
+    }
+  }
+
+  Future<dynamic> getAllData(name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? result = prefs.getStringList(name) ?? [];
+    return result;
+  }
+
+  Future<dynamic> getDataAt(index, name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? result = prefs.getStringList(name) ?? [];
+    return result![index];
+  }
+
+  Future<dynamic> delDataAt(index, name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? result = prefs.getStringList(name) ?? [];
+    return result!.removeAt(index);
   }
 }

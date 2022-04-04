@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationAlwaysAndWhenInUsageDescription</key>
+	<string>slfgsaglsawe wafarwer </string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>sdfdsfsgsdg</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>sfsdfds</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -50,8 +56,5 @@
 	<string>sdffdsf</string>
 	<key>NSCameraUsageDescription</key>
 	<string>kkkkk</string>
-	<string>This app needs access to location when open.</string>
-<key>NSLocationAlwaysUsageDescription</key>
-<string>This app needs access to location when in the background.</string>
 </dict>
 </plist>

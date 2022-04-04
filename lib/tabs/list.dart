@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../util/storage.dart';
 
 class Listing extends StatelessWidget {
   final String title;
@@ -33,8 +34,13 @@ class _MyHomePageState extends State<Option>
   @override
   void initState() {
     super.initState();
+    _initData('civil');
+  }
+
+  void _initData(type) async {
+    var list = await Storing().getAllData(type) ?? [];
     setState(() {
-      rowData = [1, 2, 3];
+      rowData = list;
     });
   }
 
@@ -43,51 +49,48 @@ class _MyHomePageState extends State<Option>
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('state = $state');
-  }
-
   Row radios() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
             flex: 1,
-            child: ListTile(
-              leading: Radio<String>(
+            child: Row(children: [
+              Radio<String>(
                 value: '0',
                 groupValue: _selectedGender,
                 onChanged: (value) {
                   setState(() {
                     _selectedGender = value!;
                   });
+                  _initData('civil');
                 },
                 activeColor: Colors.greenAccent,
               ),
-              title: const Text(
+              const Text(
                 'Danh sách dân cư',
                 style: TextStyle(fontSize: 14),
               ),
-            )),
+            ])),
         Expanded(
             flex: 1,
-            child: ListTile(
-              leading: Radio<String>(
+            child: Row(children: [
+              Radio<String>(
                 value: '1',
                 groupValue: _selectedGender,
                 onChanged: (value) {
                   setState(() {
                     _selectedGender = value!;
                   });
+                  _initData('school');
                 },
                 activeColor: Colors.greenAccent,
               ),
-              title: const Text(
+              const Text(
                 'Danh sách công trình',
                 style: TextStyle(fontSize: 14),
               ),
-            )),
+            ])),
       ],
     );
   }
@@ -127,7 +130,25 @@ class _MyHomePageState extends State<Option>
                     ),
                   ],
                 )),
-            const Expanded(flex: 1, child: Icon(Icons.more_vert))
+            DropdownButton<String>(
+              underline: const SizedBox(),
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.black,
+              ),
+              items: <String>['Tải lên', 'Xóa'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (opt) {
+                print(opt);
+              },
+            )
+            // const Expanded(flex: 1, child:
+            //  Icon(Icons.more_vert)
+            //  )
           ],
         ),
       ],

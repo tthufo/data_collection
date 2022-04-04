@@ -6,7 +6,6 @@ import 'dart:io';
 import '../component/buttoning.dart';
 import '../component/coordinate.dart';
 import '../component/camera.dart';
-import '../component/input.dart';
 import '../component/textfield.dart';
 import '../util/storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -87,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late File _image;
 
   void getCounter() async {
-    int? counter = await Storing().getCounter('school');
+    int? counter = await Storing().getCounter('schoolIndex');
     setState(() {
       unitNo = counter.toString();
     });
@@ -626,14 +625,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 ),
                 Buttoning(
                   title: "H.Thành/Lưu",
-                  onClickAction: () => {print(gradeObj)},
+                  onClickAction: () => {
+                    Storing().addData({'id': 11, 'data': latLong}, 'school')
+                  },
                   obj: const {
                     'width': 120.0,
                   },
                 ),
                 GestureDetector(
-                    onTap: () {
-                      // print(single().task);
+                    onTap: () async {
+                      Navigator.pop(context);
+                      // print(await Storing().getAllData('school'));
                     },
                     child: Image.asset(
                       "images/img_home.png",
