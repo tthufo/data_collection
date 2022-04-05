@@ -1,19 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
-class CameraView extends StatelessWidget {
+class CameraView extends StatefulWidget {
   final String title;
+  final Map<String, dynamic> obj;
   final Function(String) onClickAction;
 
   const CameraView({
     Key? key,
     required this.onClickAction,
     required this.title,
+    required this.obj,
   }) : super(key: key);
 
   @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<CameraView> {
+  String picture = "";
+
+  @override
+  initState() {
+    super.initState();
+    setState(() {
+      picture = widget.obj["picture"];
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return caming();
+    return camview(context); // caming();
+  }
+
+  @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.obj["picture"] != widget.obj["picture"]) {
+      if (widget.obj["picture"] != "") {
+        _getPic();
+      } else {
+        setState(() {
+          picture = "";
+        });
+      }
+    }
+  }
+
+  _getPic() async {
+    var localPath = await _localPath;
+    setState(() {
+      picture = "$localPath/${widget.obj["picture"]}";
+    });
   }
 
   Widget caming() {
@@ -27,7 +67,7 @@ class CameraView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title,
+              Text(widget.title,
                   style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -46,7 +86,7 @@ class CameraView extends StatelessWidget {
           children: [
             GestureDetector(
                 onTap: () {
-                  onClickAction('2');
+                  widget.onClickAction('2');
                 },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -69,7 +109,7 @@ class CameraView extends StatelessWidget {
                 )),
             GestureDetector(
                 onTap: () {
-                  onClickAction('1');
+                  widget.onClickAction('1');
                 },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -97,6 +137,11 @@ class CameraView extends StatelessWidget {
     );
   }
 
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
   Widget roundedRectBorderWidget(BuildContext context) {
     return DottedBorder(
         borderType: BorderType.RRect,
@@ -105,56 +150,108 @@ class CameraView extends StatelessWidget {
         color: Colors.greenAccent,
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(12)),
-          child: Container(
+          child: SizedBox(
             height: (MediaQuery.of(context).size.width / 1.5) * 0.65,
             width: (MediaQuery.of(context).size.width / 1.5),
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              GestureDetector(
-                  onTap: () {
-                    onClickAction('1');
-                  },
-                  child: Image.asset(
-                    "images/camera.png",
-                    height: (MediaQuery.of(context).size.width / 1.5) / 3,
-                    width: (MediaQuery.of(context).size.width / 1.5) / 2.5,
-                    fit: BoxFit.fill,
-                  )),
-              const SizedBox(height: 20),
-              GestureDetector(
-                  onTap: () {
-                    onClickAction('2');
-                  },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+            child: picture != ''
+                ? Image.file(File(picture))
+                : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        'hoặc',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        'upload file',
-                        style: TextStyle(
-                            color: Colors.blueAccent,
-                            fontSize: 16,
-                            fontStyle: FontStyle.italic,
-                            decoration: TextDecoration.underline),
-                      )
-                    ],
-                  ))
-            ]),
+                    children: [
+                        GestureDetector(
+                            onTap: () {
+                              widget.onClickAction('1');
+                            },
+                            child: Image.asset(
+                              "images/camera.png",
+                              height:
+                                  (MediaQuery.of(context).size.width / 1.5) / 3,
+                              width: (MediaQuery.of(context).size.width / 1.5) /
+                                  2.5,
+                              fit: BoxFit.fill,
+                            )),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                            onTap: () {
+                              widget.onClickAction('2');
+                            },
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  'hoặc',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  'upload file',
+                                  style: TextStyle(
+                                      color: Colors.blueAccent,
+                                      fontSize: 16,
+                                      fontStyle: FontStyle.italic,
+                                      decoration: TextDecoration.underline),
+                                )
+                              ],
+                            ))
+                      ]),
           ),
         ));
   }
 
-  Center camview(BuildContext context) {
-    return Center(
-        child: Container(
-            decoration:
-                BoxDecoration(borderRadius: BorderRadius.circular(10.0)),
-            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-            child: roundedRectBorderWidget(context)));
+  Widget camview(BuildContext context) {
+    return Column(children: [
+      const Divider(
+        color: Colors.black,
+        // height: 1,
+      ),
+      Container(
+        margin: const EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(widget.title,
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black)),
+            const Text('(Thực hiện sau khi đã xong thông tin trên)',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey)),
+          ],
+        ),
+      ),
+      const SizedBox(height: 10),
+      Center(
+          child: Container(
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(10.0)),
+              margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+              child: Column(children: [
+                const SizedBox(height: 10),
+                roundedRectBorderWidget(context),
+                picture != ""
+                    ? GestureDetector(
+                        onTap: () {
+                          widget.onClickAction('3');
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            SizedBox(height: 10),
+                            Text(
+                              'Chụp lại',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            SizedBox(height: 5),
+                          ],
+                        ))
+                    : const SizedBox(height: 10)
+              ]))),
+      const SizedBox(height: 10),
+    ]);
   }
 }

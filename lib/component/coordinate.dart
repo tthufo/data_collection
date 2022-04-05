@@ -14,7 +14,6 @@ class CoordinateView extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<CoordinateView> {
-  // bool checkedValue = false;
   bool loading = false;
 
   Future<Position> _determinePosition() async {
@@ -23,6 +22,8 @@ class _MyHomePageState extends State<CoordinateView> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
+      _showToast(
+          'Thiết bị không có cho phép truy cập vị trí hiện tại, vui lòng kiểm tra hệ thống cài đặt');
       return Future.error('Location services are disabled.');
     }
 
@@ -30,11 +31,16 @@ class _MyHomePageState extends State<CoordinateView> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        _showToast(
+            'Thiết bị không có cho phép truy cập vị trí hiện tại, vui lòng kiểm tra hệ thống cài đặt');
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
+      _showToast(
+          'Thiết bị không có cho phép truy cập vị trí hiện tại, vui lòng kiểm tra hệ thống cài đặt');
+
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
@@ -155,6 +161,15 @@ class _MyHomePageState extends State<CoordinateView> {
         )
       ],
     );
+  }
+
+  _showToast(mess) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mess),
+    ));
+    setState(() {
+      loading = false;
+    });
   }
 
   @override

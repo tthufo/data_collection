@@ -147,6 +147,7 @@ class _MyPeoplePageState extends State<PeopleView> {
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(
             border: Border.all(
+                width: 2,
                 color: widget.obj['valid'] == false
                     ? Colors.transparent
                     : Colors.redAccent)),

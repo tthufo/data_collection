@@ -12,6 +12,7 @@ import './civil_detail.dart';
 import '../util/storage.dart';
 import '../component/checker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CivilView extends StatelessWidget {
   const CivilView({Key? key}) : super(key: key);
@@ -24,7 +25,11 @@ class CivilView extends StatelessWidget {
           title: const Text("Hộ dân"),
           automaticallyImplyLeading: true,
         ),
-        body: const MyHomePage());
+        body: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: const MyHomePage()));
   }
 }
 
@@ -52,6 +57,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     'maleNo': '',
     'femaleNo': '',
     'valid': false,
+    'housePicture': '',
   };
 
   List<dynamic> condition_1 = <dynamic>[
@@ -106,9 +112,14 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     'other',
   ];
 
+  Map<String, dynamic> validOther = {
+    'checkDetail': false,
+    'checkPicture': false,
+  };
+
   List<dynamic> fieldView = <dynamic>[];
 
-  late File _image;
+  late XFile _image;
 
   bool get _validCoor {
     return latLong['lat'] == "" || latLong['long'] == "";
@@ -120,13 +131,23 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             detailList[position]['female'] == "0");
   }
 
+  Map<String, dynamic> _mergeAll() {
+    return {
+      "coordinate": latLong,
+      "people": people,
+      "condition1": condition_1,
+      "condition2": condition_2,
+      "detail": detailList
+    };
+  }
+
   _resetDetailList() {
     setState(() {
       detailList.clear();
       detailList = [
         {
           'birthDay': '',
-          "order": "1/${people['peopleNo']}",
+          "order": "1/${people['peopleNo'] == "" ? "x" : people['peopleNo']}",
           'valid': false,
           'male': '0',
           'female': '0',
@@ -157,6 +178,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
         'maleNo': '',
         'femaleNo': '',
         'valid': false,
+        'housePicture': '',
       };
 
       condition_1 = [
@@ -279,6 +301,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                           }
                           if (typing == "peopleNo") {
                             _resetDetailList();
+                            people['valid'] = false;
                           }
                         },
                         obj: people))),
@@ -296,9 +319,16 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             AbsorbPointer(
                 absorbing: _validCoor || people['peopleNo'] == "",
                 child: Container(
-                    color: _validCoor || people['peopleNo'] == ""
-                        ? const Color.fromARGB(20, 156, 156, 156)
-                        : Colors.transparent,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 2,
+                          color: !validOther['checkDetail']
+                              ? Colors.transparent
+                              : Colors.redAccent),
+                      color: _validCoor || people['peopleNo'] == ""
+                          ? const Color.fromARGB(20, 156, 156, 156)
+                          : Colors.transparent,
+                    ),
                     child: Detailing(
                         obj: detailList[position],
                         onReset: (reset) {
@@ -315,11 +345,19 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                             String typing = texting['type'];
                             if (typing == "male" || typing == "female") {
                               _resetGender(typing);
+                              setState(() {
+                                validOther['checkDetail'] = false;
+                              });
                             }
                             if (defectes.contains(typing)) {
                               _resetDefect(typing);
                             } else {
                               detailList[position][typing] = texting['text'];
+                              if (typing == 'birthDay') {
+                                setState(() {
+                                  validOther['checkDetail'] = false;
+                                });
+                              }
                             }
                           });
                         }))),
@@ -347,19 +385,32 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                     (position < int.parse(people['peopleNo']) - 1),
                 child: Container(
                     width: double.infinity,
-                    color: _validCoor ||
-                            people['peopleNo'] == "" ||
-                            _validDetail ||
-                            (position < int.parse(people['peopleNo']) - 1)
-                        ? const Color.fromARGB(20, 156, 156, 156)
-                        : Colors.transparent,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 2,
+                          color: !validOther['checkPicture']
+                              ? Colors.transparent
+                              : Colors.redAccent),
+                      color: _validCoor ||
+                              people['peopleNo'] == "" ||
+                              _validDetail ||
+                              (position < int.parse(people['peopleNo']) - 1)
+                          ? const Color.fromARGB(20, 156, 156, 156)
+                          : Colors.transparent,
+                    ),
                     child: CameraView(
                       title: 'Ảnh hộ gia đình',
+                      obj: {"picture": people['housePicture']},
                       onClickAction: (typing) {
                         if (typing == "1") {
                           getCamera();
-                        } else {
+                        } else if (typing == "2") {
                           getGallery();
+                        } else {
+                          setState(() {
+                            people['housePicture'] = "";
+                            validOther['checkPicture'] = false;
+                          });
                         }
                       },
                     ))),
@@ -454,16 +505,37 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Future getCamera() async {
     var image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (image == null) {
+      return;
+    }
+    var path = await _localPath;
+    var fileName = image.name;
+    await image.saveTo('$path/$fileName');
     setState(() {
-      _image = image as File;
+      _image = image;
+      people['housePicture'] = image.name;
+      validOther['checkPicture'] = false;
     });
   }
 
   Future getGallery() async {
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image == null) {
+      return;
+    }
+    var path = await _localPath;
+    var fileName = image.name;
+    await image.saveTo('$path/$fileName');
     setState(() {
-      _image = image as File;
+      _image = image;
+      people['housePicture'] = image.name;
+      validOther['checkPicture'] = false;
     });
+  }
+
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
   }
 
   void getCounter() async {
@@ -491,12 +563,53 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     print('state = $state');
   }
 
-  validate() {
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
+  _showToast(mess) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mess),
+    ));
+  }
+
+  bool validate() {
     if (latLong['lat'] == "" || latLong['long'] == "") {
       setState(() {
         latLong['valid'] = true;
       });
+      return false;
     }
+
+    if (people['peopleNo'] == "") {
+      setState(() {
+        people['valid'] = true;
+      });
+      return false;
+    }
+
+    if (detailList[position]['birthDay'] == "" ||
+        (detailList[position]['male'] == "0" &&
+            detailList[position]['female'] == "0")) {
+      setState(() {
+        validOther['checkDetail'] = true;
+      });
+      return false;
+    }
+
+    if (people['housePicture'] == "") {
+      setState(() {
+        validOther['checkPicture'] = true;
+      });
+      return false;
+    }
+
+    return true;
   }
 
   Column footer() {
@@ -522,9 +635,21 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                 Buttoning(
                   title: "H.Thành/Lưu",
                   onClickAction: () async => {
-                    validate(),
-                    Storing().addData({'id': 11, 'data': latLong}, 'civil')
-                    // await Storing().updateCounter('homeIndex'), getCounter()
+                    if (validate())
+                      {
+                        if (!await hasNetwork())
+                          {}
+                        else
+                          {
+                            Storing().addData(
+                                {'id': unitNo, 'data': _mergeAll()}, 'civil'),
+                            await Storing().updateCounter('homeIndex'),
+                            getCounter(),
+                            _resetAll(),
+                            _showToast(
+                                'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet')
+                          }
+                      },
                   },
                   obj: const {
                     'width': 120.0,
@@ -532,8 +657,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                 ),
                 GestureDetector(
                     onTap: () async {
-                      // Navigator.pop(context);
-                      print(await Storing().getAllData('civil'));
+                      Navigator.pop(context);
                     },
                     child: Image.asset(
                       "images/img_home.png",
@@ -549,17 +673,19 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Container(
-            color: Colors.white,
-            child: Column(
-              children: [
-                Expanded(
-                    flex: 9,
-                    child: SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(), child: body())),
-                footer(),
-              ],
-            )));
+    return SafeArea(
+        child: Center(
+            child: Container(
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    Expanded(
+                        flex: 9,
+                        child: SingleChildScrollView(
+                            physics: const ClampingScrollPhysics(),
+                            child: body())),
+                    footer(),
+                  ],
+                ))));
   }
 }

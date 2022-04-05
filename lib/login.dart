@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import './option.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import './util/storage.dart';
+import 'dart:io';
+import 'option.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -11,22 +12,26 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-      children: <Widget>[
-        Container(
-          decoration: const BoxDecoration(
-            color: Colors.pink,
-            // image: DecorationImage(
-            //   image: AssetImage("images/bg_img.png"),
-            //   fit: BoxFit.cover,
-            // ),
-          ),
-        ),
-        const Center(
-          child: Center(child: MyHomePage()),
-        )
-      ],
-    ));
+        body: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.pink,
+                    // image: DecorationImage(
+                    //   image: AssetImage("images/bg_img.png"),
+                    //   fit: BoxFit.cover,
+                    // ),
+                  ),
+                ),
+                const Center(
+                  child: Center(child: MyHomePage()),
+                )
+              ],
+            )));
   }
 }
 
@@ -47,15 +52,33 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   static final TextEditingController _textController = TextEditingController();
 
   Future<dynamic> didRequestLogin(message) async {
-    Map<String, dynamic> body = {"message": message};
-    http.Response response = await http.post(
-      Uri.parse("https://webhook.site/5cda9725-8273-434b-bf34-b68c9891ae87"),
-      body: body,
+    // Map<String, dynamic> body = {"message": message};
+
+    http.Response response = await http.get(
+      Uri.parse(
+          "https://thiethai.vggisopen.com/api/auth/login?username=sa&password=123456"),
+      // body: body,
       headers: {"Accept": "application/json"},
-      encoding: Encoding.getByName('utf-8'),
+      // encoding: Encoding.getByName('utf-8'),
     );
 
-    Map<String, dynamic> dataToken = jsonDecode(response.body);
+    // Map<String, dynamic> dataToken = jsonDecode(response.body);
+    print(response.body);
+  }
+
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
+  _showToast(mess) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mess),
+    ));
   }
 
   Widget emailField() {
@@ -158,13 +181,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     ));
   }
 
-  void _didRequestLogin() {
+  void _didRequestLogin() async {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const OptionView()));
 
-    // print(await Storing().getCounter('home'));
-    // Storing().updateCounter('home');
-    // print(await Storing().getCounter('home'));
+    if (!await hasNetwork()) {
+      _showToast('Mạng internet không khả dụng');
+      return;
+    }
+    // context.loaderOverlay.show();
+
+    didRequestLogin('');
+
     if (password.isEmpty || name.isEmpty) {
       setState(() {
         errorMessage = "Bạn cần nhập đủ thông tin xác thực";

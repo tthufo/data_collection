@@ -187,6 +187,7 @@ class _MyHomePageState extends State<Option>
         const SizedBox(height: 15),
         CameraView(
           title: '',
+          obj: {},
           onClickAction: (typing) {
             if (typing == "1") {
               getCamera();

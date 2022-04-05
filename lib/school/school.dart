@@ -3,12 +3,14 @@ import 'package:vrp_app/component/checker.dart';
 import 'package:vrp_app/component/header.dart';
 import 'dart:async';
 import 'dart:io';
+
 import '../component/buttoning.dart';
 import '../component/coordinate.dart';
 import '../component/camera.dart';
 import '../component/textfield.dart';
 import '../util/storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class SchoolView extends StatelessWidget {
   const SchoolView({Key? key}) : super(key: key);
@@ -21,7 +23,11 @@ class SchoolView extends StatelessWidget {
           title: const Text("Trường học"),
           automaticallyImplyLeading: true,
         ),
-        body: const MyHomePage());
+        body: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: const MyHomePage()));
   }
 }
 
@@ -42,19 +48,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     'valid': false,
   };
 
-  Map<String, dynamic> schoolDetail = {
-    'room': '',
-    'pupil': '',
-    'pupilMale': '',
-    'pupilFemale': '',
-    'teacher': '',
-    'teacherMale': '',
-    'teacherFemale': '',
-    'peopleEvac': '',
-    'peopleEvacMale': '',
-    'peopleEvacFemale': '',
-  };
-
   Map<String, dynamic> gradeObj = {
     'lvl1': '0',
     'lvl2': '0',
@@ -70,6 +63,21 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     'valid': false,
   };
 
+  Map<String, dynamic> schoolDetail = {
+    'room': '',
+    'pupil': '',
+    'pupilMale': '',
+    'pupilFemale': '',
+    'teacher': '',
+    'teacherMale': '',
+    'teacherFemale': '',
+    'peopleEvac': '',
+    'peopleEvacMale': '',
+    'peopleEvacFemale': '',
+    'schoolPicture': '',
+    'valid': false,
+  };
+
   var gradeKey = [
     "lvl1",
     "lvl2",
@@ -79,11 +87,56 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     "lvl6",
     "lvl7",
   ];
+
   var conditionKey = ["con1", "con2", "con3"];
 
   List<dynamic> listText = <dynamic>[];
 
-  late File _image;
+  late XFile _image;
+
+  Map<String, dynamic> validOther = {
+    'checkPicture': false,
+  };
+
+  Map<String, dynamic> _mergeAll() {
+    return {
+      "coordinate": latLong,
+      "grade": gradeObj,
+      "detail": schoolDetail,
+    };
+  }
+
+  bool validate() {
+    if (latLong['lat'] == "" || latLong['long'] == "") {
+      setState(() {
+        latLong['valid'] = true;
+      });
+      return false;
+    }
+
+    if (_validHeader) {
+      setState(() {
+        gradeObj['valid'] = true;
+      });
+      return false;
+    }
+
+    if (_validDetail) {
+      setState(() {
+        schoolDetail['valid'] = true;
+      });
+      return false;
+    }
+
+    if (schoolDetail['schoolPicture'] == "") {
+      setState(() {
+        validOther['checkPicture'] = true;
+      });
+      return false;
+    }
+
+    return true;
+  }
 
   void getCounter() async {
     int? counter = await Storing().getCounter('schoolIndex');
@@ -94,16 +147,37 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Future getCamera() async {
     var image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (image == null) {
+      return;
+    }
+    var path = await _localPath;
+    var fileName = image.name;
+    await image.saveTo('$path/$fileName');
     setState(() {
-      _image = image as File;
+      _image = image;
+      schoolDetail['schoolPicture'] = image.name;
+      validOther['checkPicture'] = false;
     });
   }
 
   Future getGallery() async {
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image == null) {
+      return;
+    }
+    var path = await _localPath;
+    var fileName = image.name;
+    await image.saveTo('$path/$fileName');
     setState(() {
-      _image = image as File;
+      _image = image;
+      schoolDetail['schoolPicture'] = image.name;
+      validOther['checkPicture'] = false;
     });
+  }
+
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
   }
 
   bool get _validCoor {
@@ -124,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   bool get _validDetail {
     for (var key in schoolDetail.keys) {
-      if (schoolDetail[key] == "") {
+      if (schoolDetail[key] == "" && key != "schoolPicture" && key != "valid") {
         return true;
       }
     }
@@ -151,6 +225,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         'peopleEvac': '',
         'peopleEvacMale': '',
         'peopleEvacFemale': '',
+        'schoolPicture': '',
+        'valid': false,
       };
 
       gradeObj = {
@@ -201,6 +277,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             ? const Color.fromARGB(20, 156, 156, 156)
                             : Colors.transparent,
                         border: Border.all(
+                            width: 2,
                             color: gradeObj['valid'] == false
                                 ? Colors.transparent
                                 : Colors.redAccent)),
@@ -215,23 +292,44 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             AbsorbPointer(
                 absorbing: _validCoor || _validHeader,
                 child: Container(
-                    color: _validCoor
-                        ? const Color.fromARGB(20, 156, 156, 156)
-                        : Colors.transparent,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2,
+                        color: !schoolDetail['valid']
+                            ? Colors.transparent
+                            : Colors.redAccent,
+                      ),
+                      color: _validCoor
+                          ? const Color.fromARGB(20, 156, 156, 156)
+                          : Colors.transparent,
+                    ),
                     child: detail())),
             AbsorbPointer(
                 absorbing: _validCoor || _validHeader || _validDetail,
                 child: Container(
-                    color: _validCoor
-                        ? const Color.fromARGB(20, 156, 156, 156)
-                        : Colors.transparent,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 2,
+                          color: !validOther['checkPicture']
+                              ? Colors.transparent
+                              : Colors.redAccent),
+                      color: _validCoor
+                          ? const Color.fromARGB(20, 156, 156, 156)
+                          : Colors.transparent,
+                    ),
                     child: CameraView(
                       title: 'Ảnh trường học',
+                      obj: {"picture": schoolDetail['schoolPicture']},
                       onClickAction: (typing) {
                         if (typing == "1") {
                           getCamera();
-                        } else {
+                        } else if (typing == "2") {
                           getGallery();
+                        } else {
+                          setState(() {
+                            schoolDetail['schoolPicture'] = "";
+                            validOther['checkPicture'] = false;
+                          });
                         }
                       },
                     ))),
@@ -256,6 +354,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           }
         }
       }
+      gradeObj['valid'] = false;
     });
   }
 
@@ -345,6 +444,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           } else {
                             setState(() {
                               gradeObj['school'] = texting;
+                              gradeObj['valid'] = false;
                             });
                           }
                         })),
@@ -410,6 +510,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['room'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             })
@@ -428,6 +529,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['pupil'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             })
@@ -448,6 +550,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['pupilMale'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             }),
@@ -465,6 +568,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['pupilFemale'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             })
@@ -483,6 +587,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['teacher'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             })
@@ -503,6 +608,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['teacherMale'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             }),
@@ -520,6 +626,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['teacherFemale'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             })
@@ -541,6 +648,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['peopleEvac'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             })
@@ -561,6 +669,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['peopleEvacMale'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             }),
@@ -578,6 +687,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               } else {
                 setState(() {
                   schoolDetail['peopleEvacFemale'] = texting;
+                  schoolDetail['valid'] = false;
                 });
               }
             })
@@ -603,6 +713,21 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     print('state = $state');
   }
 
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
+  _showToast(mess) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mess),
+    ));
+  }
+
   Widget footer() {
     return Column(
       children: [
@@ -625,17 +750,30 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 ),
                 Buttoning(
                   title: "H.Thành/Lưu",
-                  onClickAction: () => {
-                    Storing().addData({'id': 11, 'data': latLong}, 'school')
+                  onClickAction: () async => {
+                    if (validate())
+                      {
+                        if (await hasNetwork())
+                          {}
+                        else
+                          {
+                            Storing().addData(
+                                {'id': unitNo, 'data': _mergeAll()}, 'school'),
+                            await Storing().updateCounter('schoolIndex'),
+                            getCounter(),
+                            _resetAll(),
+                            _showToast(
+                                'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet')
+                          }
+                      }
                   },
                   obj: const {
                     'width': 120.0,
                   },
                 ),
                 GestureDetector(
-                    onTap: () async {
+                    onTap: () {
                       Navigator.pop(context);
-                      // print(await Storing().getAllData('school'));
                     },
                     child: Image.asset(
                       "images/img_home.png",
@@ -651,16 +789,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            Expanded(
-                flex: 9,
-                child: SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(), child: body())),
-            footer(),
-          ],
-        ));
+    return SafeArea(
+        child: Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                Expanded(
+                    flex: 9,
+                    child: SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(), child: body())),
+                footer(),
+              ],
+            )));
   }
 }

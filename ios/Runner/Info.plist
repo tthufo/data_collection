@@ -41,9 +41,6 @@
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
@@ -53,8 +50,8 @@
 		<true/>
 	</dict>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>sdffdsf</string>
+	<string>Ứng dụng cần truy cập Bộ sưu tập để tiếp nhận hình ảnh cụ thể</string>
 	<key>NSCameraUsageDescription</key>
-	<string>kkkkk</string>
+	<string>Ứng dụng cần truy cập Máy ảnh để tiếp nhận hình ảnh cụ thể</string>
 </dict>
 </plist>

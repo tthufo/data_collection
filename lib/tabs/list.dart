@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../util/storage.dart';
 
@@ -42,6 +44,7 @@ class _MyHomePageState extends State<Option>
     setState(() {
       rowData = list;
     });
+    print(list);
   }
 
   @override
@@ -95,9 +98,10 @@ class _MyHomePageState extends State<Option>
     );
   }
 
-  Container card(object) {
-    return Container(
-        child: Column(
+  Widget card(object, pos) {
+    var data = object['data'];
+    var id = object['id'];
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Row(
@@ -114,20 +118,43 @@ class _MyHomePageState extends State<Option>
                 flex: 8,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      'can hoj',
+                      '${_selectedGender == "0" ? "Hộ" : "Trường"} số ${id}',
                       maxLines: 1,
-                      style: TextStyle(color: Colors.blueAccent, fontSize: 16),
+                      style: const TextStyle(
+                          color: Colors.blueAccent, fontSize: 16),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
-                    Text(
-                      'kinh ddooj vix ddooj',
-                      maxLines: 1,
-                      style: TextStyle(color: Colors.redAccent, fontSize: 14),
-                    ),
+                    Row(children: [
+                      Expanded(
+                          flex: 1,
+                          child: Row(children: [
+                            const Text(
+                              'K.dộ:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Flexible(
+                                child: Text(data['coordinate']['lat'],
+                                    maxLines: 1)),
+                          ])),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                          flex: 1,
+                          child: Row(children: [
+                            const Text(
+                              'V.độ:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Flexible(
+                                child: Text(data['coordinate']['long'],
+                                    maxLines: 1)),
+                          ]))
+                    ])
                   ],
                 )),
             DropdownButton<String>(
@@ -143,7 +170,12 @@ class _MyHomePageState extends State<Option>
                 );
               }).toList(),
               onChanged: (opt) {
-                print(opt);
+                if (opt == "Tải lên") {
+                } else {
+                  Storing().delDataAt(
+                      pos, _selectedGender == "0" ? "civil" : "school");
+                  _initData(_selectedGender == "0" ? "civil" : "school");
+                }
               },
             )
             // const Expanded(flex: 1, child:
@@ -152,7 +184,7 @@ class _MyHomePageState extends State<Option>
           ],
         ),
       ],
-    ));
+    );
   }
 
   @override
@@ -173,7 +205,7 @@ class _MyHomePageState extends State<Option>
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 10.0, horizontal: 10.0),
-                    child: card(rowData[pos]),
+                    child: card(jsonDecode(rowData[pos]), pos),
                   ),
                 ));
           },

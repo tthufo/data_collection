@@ -53,12 +53,13 @@ class Storing {
   Future<dynamic> getDataAt(index, name) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? result = prefs.getStringList(name) ?? [];
-    return result![index];
+    return result[index];
   }
 
-  Future<dynamic> delDataAt(index, name) async {
+  void delDataAt(index, name) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? result = prefs.getStringList(name) ?? [];
-    return result!.removeAt(index);
+    result.removeAt(index);
+    prefs.setStringList(name, result);
   }
 }
