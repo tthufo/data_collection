@@ -120,7 +120,7 @@ class _MyHomePageState extends State<Option>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${_selectedGender == "0" ? "Hộ" : "Trường"} số ${id}',
+                      '${_selectedGender == "0" ? "Hộ" : "Trường"} số $id',
                       maxLines: 1,
                       style: const TextStyle(
                           color: Colors.blueAccent, fontSize: 16),

@@ -39,15 +39,15 @@ class _MyHomePageState extends State<Detailing> {
         AbsorbPointer(
             absorbing: widget.obj['defected'] == "0",
             child: Container(
-                color: widget.obj['defected'] == "0"
-                    ? const Color.fromARGB(20, 156, 156, 156)
-                    : Colors.transparent,
+                // color: widget.obj['defected'] == "0"
+                //     ? const Color.fromARGB(20, 156, 156, 156)
+                //     : Colors.transparent,
                 child: Row(
-                  children: [
-                    const Expanded(flex: 2, child: Text('')),
-                    Expanded(flex: 8, child: end())
-                  ],
-                )))
+              children: [
+                const Expanded(flex: 2, child: Text('')),
+                Expanded(flex: 8, child: end())
+              ],
+            )))
       ],
     );
   }
@@ -94,7 +94,8 @@ class _MyHomePageState extends State<Detailing> {
                             width: 100,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
+                                border: Border.all(
+                                    color: Colors.blueAccent, width: 1.5),
                                 borderRadius: BorderRadius.circular(4.0)),
                             child: Text(widget.obj['birthDay'] ?? ''))),
                     const SizedBox(width: 10),
@@ -151,7 +152,8 @@ class _MyHomePageState extends State<Detailing> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Đặc điểm:',
-                textAlign: TextAlign.start, style: TextStyle(fontSize: 14)),
+                textAlign: TextAlign.start,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
             Row(
               children: [
                 Checker(

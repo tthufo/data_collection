@@ -22,8 +22,8 @@ class CivilView extends StatelessWidget {
     return Scaffold(
         resizeToAvoidBottomInset: true, // set it to false
         appBar: AppBar(
-          title: const Text("Hộ dân"),
-          automaticallyImplyLeading: true,
+          title: const Text("PHÂN BỐ DÂN CƯ"),
+          automaticallyImplyLeading: false,
         ),
         body: GestureDetector(
             onTap: () {
@@ -284,9 +284,9 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             AbsorbPointer(
                 absorbing: _validCoor,
                 child: Container(
-                    color: _validCoor
-                        ? const Color.fromARGB(20, 156, 156, 156)
-                        : Colors.transparent,
+                    // color: _validCoor
+                    //     ? const Color.fromARGB(20, 156, 156, 156)
+                    //     : Colors.transparent,
                     width: double.infinity,
                     alignment: Alignment.centerLeft,
                     child: PeopleView(
@@ -308,9 +308,9 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             AbsorbPointer(
                 absorbing: _validCoor,
                 child: Container(
-                  color: _validCoor
-                      ? const Color.fromARGB(20, 156, 156, 156)
-                      : Colors.transparent,
+                  // color: _validCoor
+                  //     ? const Color.fromARGB(20, 156, 156, 156)
+                  //     : Colors.transparent,
                   child: checker(),
                 )),
             const Heading(obj: {
@@ -325,9 +325,9 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                           color: !validOther['checkDetail']
                               ? Colors.transparent
                               : Colors.redAccent),
-                      color: _validCoor || people['peopleNo'] == ""
-                          ? const Color.fromARGB(20, 156, 156, 156)
-                          : Colors.transparent,
+                      // color: _validCoor || people['peopleNo'] == ""
+                      //     ? const Color.fromARGB(20, 156, 156, 156)
+                      //     : Colors.transparent,
                     ),
                     child: Detailing(
                         obj: detailList[position],
@@ -369,12 +369,12 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                     height: people['peopleNo'] != "" &&
                             int.parse(people['peopleNo']) != 0 &&
                             int.parse(people['peopleNo']) - 1 > position
-                        ? 80
+                        ? 85
                         : 0,
-                    color:
-                        _validCoor || people['peopleNo'] == "" || _validDetail
-                            ? const Color.fromARGB(20, 156, 156, 156)
-                            : Colors.transparent,
+                    // color:
+                    //     _validCoor || people['peopleNo'] == "" || _validDetail
+                    //         ? const Color.fromARGB(20, 156, 156, 156)
+                    //         : Colors.transparent,
                     child: Next(onClickAction: () {
                       _goNext();
                     }))),
@@ -391,12 +391,12 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                           color: !validOther['checkPicture']
                               ? Colors.transparent
                               : Colors.redAccent),
-                      color: _validCoor ||
-                              people['peopleNo'] == "" ||
-                              _validDetail ||
-                              (position < int.parse(people['peopleNo']) - 1)
-                          ? const Color.fromARGB(20, 156, 156, 156)
-                          : Colors.transparent,
+                      // color: _validCoor ||
+                      //         people['peopleNo'] == "" ||
+                      //         _validDetail ||
+                      //         (position < int.parse(people['peopleNo']) - 1)
+                      //     ? const Color.fromARGB(20, 156, 156, 156)
+                      //     : Colors.transparent,
                     ),
                     child: CameraView(
                       title: 'Ảnh hộ gia đình',
@@ -468,7 +468,8 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Tình trạng hộ/nhà:',
-                textAlign: TextAlign.start, style: TextStyle(fontSize: 14)),
+                textAlign: TextAlign.start,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
             Row(
                 children: condition_1.map(
               (item) {
@@ -612,12 +613,44 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     return true;
   }
 
+  showAlertDialog(BuildContext context) {
+    Widget cancelButton = TextButton(
+      child: const Text("Bỏ qua"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = TextButton(
+      child: const Text("Xóa"),
+      onPressed: () {
+        _resetAll();
+        Navigator.pop(context);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Thông báo"),
+      content: const Text("Bạn có muốn xóa hết thông tin cập nhật?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Column footer() {
     return Column(
       children: [
         const Divider(
-          height: 1,
-          color: Colors.black,
+          height: 2,
+          color: Colors.grey,
         ),
         Container(
             padding: const EdgeInsets.all(5),
@@ -627,9 +660,12 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: [
                 Buttoning(
                   title: "Xóa",
-                  onClickAction: () => {_resetAll()},
+                  onClickAction: () => {showAlertDialog(context)},
                   obj: const {
                     'width': 60.0,
+                    'height': 45.0,
+                    'bgColor': Colors.red,
+                    'titleColor': Colors.white,
                   },
                 ),
                 Buttoning(
@@ -653,6 +689,9 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                   },
                   obj: const {
                     'width': 120.0,
+                    'height': 45.0,
+                    'bgColor': Color.fromRGBO(39, 77, 158, 1),
+                    'titleColor': Colors.white,
                   },
                 ),
                 GestureDetector(
@@ -661,8 +700,8 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                     },
                     child: Image.asset(
                       "images/img_home.png",
-                      height: 40,
-                      width: 40,
+                      height: 45,
+                      width: 45,
                       fit: BoxFit.fill,
                     ))
               ],

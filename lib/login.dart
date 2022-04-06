@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:loader_overlay/loader_overlay.dart';
@@ -49,21 +50,40 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   String errorMessage = "";
 
+  bool isLogin = false;
+
   static final TextEditingController _textController = TextEditingController();
 
   Future<dynamic> didRequestLogin(message) async {
-    // Map<String, dynamic> body = {"message": message};
-
+    var url = message.runtimeType == String
+        ? "http://gisgo.vn:8016/api/auth/login?username=${name}&password=${password}"
+        : "http://gisgo.vn:8016/api/auth/login?username=${message['name']}&password=${message['password']}";
     http.Response response = await http.get(
-      Uri.parse(
-          "https://thiethai.vggisopen.com/api/auth/login?username=sa&password=123456"),
-      // body: body,
+      Uri.parse(url),
       headers: {"Accept": "application/json"},
-      // encoding: Encoding.getByName('utf-8'),
     );
 
-    // Map<String, dynamic> dataToken = jsonDecode(response.body);
-    print(response.body);
+    context.loaderOverlay.hide();
+    Map<String, dynamic> data = jsonDecode(response.body);
+
+    if (data['status'] == "OK") {
+      if (isLogin) {
+        Storing().addString(
+            message.runtimeType == String ? name : message['name'], 'name');
+        Storing().addString(
+            message.runtimeType == String ? password : message['password'],
+            'password');
+      } else {
+        Storing().delString('name');
+        Storing().delString('password');
+      }
+      Storing().addString(data['data']['token'], 'token');
+      Route route = MaterialPageRoute(builder: (context) => const OptionView());
+      Navigator.pushReplacement(context, route);
+    } else {
+      var error = data['errors'][0];
+      _showToast(error['message']);
+    }
   }
 
   Future<bool> hasNetwork() async {
@@ -136,11 +156,37 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         ));
   }
 
-  Container forgot() {
-    return Container(
-      height: 30,
-      alignment: Alignment.centerRight,
-      child: DecoratedBox(
+  Widget forgot() {
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Row(children: [
+        SizedBox(
+            width: 20,
+            height: 20,
+            child: Checkbox(
+              side: MaterialStateBorderSide.resolveWith(
+                (states) => const BorderSide(width: 1.5, color: Colors.white),
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4)),
+              checkColor: Colors.white,
+              activeColor: Colors.blueAccent,
+              value: isLogin,
+              onChanged: (bool? value) {
+                setState(() {
+                  isLogin = value!;
+                });
+                Storing().addString(value == true ? "1" : "0", "logged");
+              },
+            )),
+        const SizedBox(
+          width: 5,
+        ),
+        const Text(
+          "Lưu mật khẩu",
+          style: TextStyle(fontSize: 14, color: Colors.white),
+        ),
+      ]),
+      DecoratedBox(
         decoration: const BoxDecoration(color: null),
         child: GestureDetector(
           onTap: () {},
@@ -153,52 +199,52 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           ),
         ),
       ),
-    );
+    ]);
   }
 
-  Container buttoning({required Function onClickAction}) {
+  Widget buttoning({required Function onClickAction}) {
     return Container(
-        child: Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(10.0),
-      color: Colors.greenAccent,
-      child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width - 0,
-        padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {
-          onClickAction();
-        },
-        child: const Text(
-          "Đăng nhập",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'Montserrat',
-            color: Colors.white,
-            fontSize: 18.0,
-          ),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(10),
         ),
-      ),
-    ));
+        child: Material(
+          elevation: 5.0,
+          borderRadius: BorderRadius.circular(10.0),
+          color: Colors.blue,
+          child: MaterialButton(
+            minWidth: MediaQuery.of(context).size.width - 0,
+            padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+            onPressed: () {
+              onClickAction();
+            },
+            child: const Text(
+              "Đăng nhập",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 18.0,
+              ),
+            ),
+          ),
+        ));
   }
 
   void _didRequestLogin() async {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const OptionView()));
-
     if (!await hasNetwork()) {
       _showToast('Mạng internet không khả dụng');
       return;
     }
-    // context.loaderOverlay.show();
-
-    didRequestLogin('');
-
     if (password.isEmpty || name.isEmpty) {
       setState(() {
-        errorMessage = "Bạn cần nhập đủ thông tin xác thực";
+        errorMessage = "Bạn cần nhập đủ thông tin đăng nhập";
       });
       return;
     }
+    context.loaderOverlay.show();
+
+    didRequestLogin('');
   }
 
   Widget body() {
@@ -239,6 +285,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             emailField(),
             const SizedBox(height: 35.0),
             passwordField(),
+            const SizedBox(height: 15.0),
             forgot(),
             const SizedBox(height: 5.0),
             Text(errorMessage,
@@ -259,6 +306,35 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     super.initState();
     _textController.text = "";
     Storing().initCounter();
+    initData();
+  }
+
+  initData() async {
+    if (await Storing().getString('logged') == "" ||
+        await Storing().getString('logged') == null) {
+      Storing().addString("0", 'logged');
+    }
+    String bo = await Storing().getString('logged');
+    setState(() {
+      isLogin = bo == "1";
+    });
+    // String token = await Storing().getString('token');
+    if (bo == "1") {
+      if (!await hasNetwork()) {
+        Route route =
+            MaterialPageRoute(builder: (context) => const OptionView());
+        Navigator.pushReplacement(context, route);
+      } else {
+        String name = await Storing().getString('name');
+        String password = await Storing().getString('password');
+        context.loaderOverlay.show();
+        setState(() {
+          name = name;
+          password = password;
+          didRequestLogin({'name': name, 'password': password});
+        });
+      }
+    }
   }
 
   @override
@@ -287,7 +363,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: [
                 Container(
                     margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: const Divider(color: Colors.grey)),
+                    child: const Divider(color: Colors.blue)),
                 const Text(
                     'Công cụ được quản lý bởi bản chỉ đạo quốc gia về \n PCTT và hỗ trợ UNDP, Green Climate Fund',
                     textAlign: TextAlign.center,

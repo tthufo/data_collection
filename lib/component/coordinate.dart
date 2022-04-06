@@ -87,7 +87,7 @@ class _MyHomePageState extends State<CoordinateView> {
               children: [
                 const Text(
                   "Vị trí:",
-                  style: TextStyle(fontSize: 14),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(
                   width: 15,
@@ -98,8 +98,14 @@ class _MyHomePageState extends State<CoordinateView> {
                     child: loading
                         ? const CircularProgressIndicator()
                         : Checkbox(
+                            side: MaterialStateBorderSide.resolveWith(
+                              (states) => const BorderSide(
+                                  width: 1.5, color: Colors.blueAccent),
+                            ),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4)),
                             checkColor: Colors.white,
-                            activeColor: Colors.greenAccent,
+                            activeColor: Colors.blueAccent,
                             value: widget.latLong['checked'],
                             onChanged: (bool? value) {
                               if (!widget.latLong['checked']) {
@@ -121,7 +127,7 @@ class _MyHomePageState extends State<CoordinateView> {
                   width: 5,
                 ),
                 const Text(
-                  "Nhận vị trí",
+                  "Nhận tọa độ",
                   style: TextStyle(fontSize: 14),
                 ),
               ],

@@ -36,6 +36,7 @@ class _MyPeoplePageState extends State<PeopleView> {
           child: FieldView(
               obj: {
                 "start": "Số người",
+                "startStyle": FontWeight.bold,
                 "end": "người",
                 "text": widget.obj['peopleNo'],
                 "type": TextInputType.number,

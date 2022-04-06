@@ -20,8 +20,8 @@ class SchoolView extends StatelessWidget {
     return Scaffold(
         resizeToAvoidBottomInset: true, // set it to false
         appBar: AppBar(
-          title: const Text("Trường học"),
-          automaticallyImplyLeading: true,
+          title: const Text("TRƯỜNG HỌC"),
+          automaticallyImplyLeading: false,
         ),
         body: GestureDetector(
             onTap: () {
@@ -273,9 +273,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 absorbing: _validCoor,
                 child: Container(
                     decoration: BoxDecoration(
-                        color: _validCoor
-                            ? const Color.fromARGB(20, 156, 156, 156)
-                            : Colors.transparent,
+                        // color: _validCoor
+                        //     ? const Color.fromARGB(20, 156, 156, 156)
+                        //     : Colors.transparent,
                         border: Border.all(
                             width: 2,
                             color: gradeObj['valid'] == false
@@ -299,9 +299,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             ? Colors.transparent
                             : Colors.redAccent,
                       ),
-                      color: _validCoor
-                          ? const Color.fromARGB(20, 156, 156, 156)
-                          : Colors.transparent,
+                      // color: _validCoor
+                      //     ? const Color.fromARGB(20, 156, 156, 156)
+                      //     : Colors.transparent,
                     ),
                     child: detail())),
             AbsorbPointer(
@@ -313,9 +313,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           color: !validOther['checkPicture']
                               ? Colors.transparent
                               : Colors.redAccent),
-                      color: _validCoor
-                          ? const Color.fromARGB(20, 156, 156, 156)
-                          : Colors.transparent,
+                      // color: _validCoor
+                      //     ? const Color.fromARGB(20, 156, 156, 156)
+                      //     : Colors.transparent,
                     ),
                     child: CameraView(
                       title: 'Ảnh trường học',
@@ -365,7 +365,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           children: [
             Row(
               children: [
-                const Text("Cấp:"),
+                const Text("Cấp:",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(width: 5),
                 Checker(
                     onChange: (typing) {
@@ -423,8 +424,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         child: Column(
           children: [
             Row(
-              children: const [
-                Text("Tên trường:"),
+              children: [
+                SizedBox(width: MediaQuery.of(context).size.width * 0.1),
+                const Text("Tên trường:"),
               ],
             ),
             const SizedBox(height: 5),
@@ -432,11 +434,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: [
                 const SizedBox(width: 20),
                 SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.7,
+                    width: MediaQuery.of(context).size.width * 0.8,
                     child: FieldView(
                         obj: {
                           "limit": 100,
-                          "width": MediaQuery.of(context).size.width * 0.6,
+                          "textAlign": TextAlign.left,
+                          "width": MediaQuery.of(context).size.width * 0.72,
                         },
                         onChange: (texting) {
                           if (texting.runtimeType != String) {
@@ -461,7 +464,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           children: [
             Row(
               children: const [
-                Text("T.Trạng nhà:"),
+                Text("T.Trạng nhà:",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
             Row(
@@ -500,7 +504,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       Row(children: [
         FieldView(
             obj: {
-              "start": "Số phòng học:",
+              "width": 60.0,
+              "start": "Số phòng học    ",
+              "startStyle": FontWeight.bold,
               "text": schoolDetail['room'],
               "type": TextInputType.number,
             },
@@ -516,9 +522,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             })
       ]),
       Row(children: [
+        const SizedBox(width: 2),
         FieldView(
             obj: {
-              "start": "Số học sinh:   ",
+              "width": 60.0,
+              "start": "Số học sinh       ",
+              "startStyle": FontWeight.bold,
               "end": "người",
               "text": schoolDetail['pupil'],
               "type": TextInputType.number,
@@ -576,7 +585,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       Row(children: [
         FieldView(
             obj: {
-              "start": "Số GV/C.bộ:   ",
+              "width": 60.0,
+              "start": "Số GV/C.bộ       ",
+              "startStyle": FontWeight.bold,
               "end": "người",
               "text": schoolDetail['teacher'],
               "type": TextInputType.number,
@@ -631,13 +642,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               }
             })
       ]),
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
-        Text('Số người có thể sơ tán phòng chống thiên tai:')
+      Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+        Container(
+            padding: const EdgeInsets.all(10),
+            child: const Text('Số người có thể sơ tán phòng chống thiên tai:',
+                style: TextStyle(fontWeight: FontWeight.bold)))
       ]),
       Row(children: [
         FieldView(
             obj: {
-              "start": "Tổng số:         ",
+              "width": 60.0,
+              "start": "Tổng số:             ",
+              "startStyle": FontWeight.bold,
               "end": "người",
               "text": schoolDetail['peopleEvac'],
               "type": TextInputType.number,
@@ -728,12 +744,44 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     ));
   }
 
+  showAlertDialog(BuildContext context) {
+    Widget cancelButton = TextButton(
+      child: const Text("Bỏ qua"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = TextButton(
+      child: const Text("Xóa"),
+      onPressed: () {
+        _resetAll();
+        Navigator.pop(context);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Thông báo"),
+      content: const Text("Bạn có muốn xóa hết thông tin cập nhật?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Widget footer() {
     return Column(
       children: [
         const Divider(
           height: 1,
-          color: Colors.black,
+          color: Colors.grey,
         ),
         Container(
             padding: const EdgeInsets.all(5),
@@ -743,9 +791,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: [
                 Buttoning(
                   title: "Xóa",
-                  onClickAction: () => {_resetAll()},
+                  onClickAction: () => {showAlertDialog(context)},
                   obj: const {
                     'width': 60.0,
+                    'height': 45.0,
+                    'bgColor': Colors.red,
+                    'titleColor': Colors.white,
                   },
                 ),
                 Buttoning(
@@ -769,6 +820,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   },
                   obj: const {
                     'width': 120.0,
+                    'height': 45.0,
+                    'bgColor': Color.fromRGBO(39, 77, 158, 1),
+                    'titleColor': Colors.white,
                   },
                 ),
                 GestureDetector(
@@ -777,8 +831,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     },
                     child: Image.asset(
                       "images/img_home.png",
-                      height: 40,
-                      width: 40,
+                      height: 45,
+                      width: 45,
                       fit: BoxFit.fill,
                     ))
               ],

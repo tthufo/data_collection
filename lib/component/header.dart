@@ -12,7 +12,7 @@ class Heading extends StatelessWidget {
 
   Container buttoning(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(10),
         color: Colors.yellowAccent,
         width: MediaQuery.of(context).size.width,
         child: obj['title'] != null

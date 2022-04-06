@@ -10,22 +10,25 @@ class OptionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-      children: <Widget>[
-        Container(
-          decoration: const BoxDecoration(
-            color: Colors.pink,
-            // image: DecorationImage(
-            //   image: AssetImage("images/bg_img.png"),
-            //   fit: BoxFit.cover,
-            // ),
-          ),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
         ),
-        const Center(
-          child: Center(child: MyHomePage()),
-        )
-      ],
-    ));
+        body: Stack(
+          children: <Widget>[
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                // image: DecorationImage(
+                //   image: AssetImage("images/bg_img.png"),
+                //   fit: BoxFit.cover,
+                // ),
+              ),
+            ),
+            const Center(
+              child: Center(child: MyHomePage()),
+            )
+          ],
+        ));
   }
 }
 
@@ -47,14 +50,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             Container(
               child: const Text(""),
               color: Colors.grey,
-              height: MediaQuery.of(context).size.height * 0.06,
+              height: MediaQuery.of(context).size.height * 0.02,
             ),
             Image.asset("images/img_logos.png",
-                height: 80, width: 80, fit: BoxFit.cover),
+                height: 120, width: 120, fit: BoxFit.cover),
             const SizedBox(height: 15.0),
             Container(
                 width: MediaQuery.of(context).size.width,
-                color: Colors.yellowAccent,
+                color: Colors.yellow,
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -62,14 +65,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     Text("LỰA CHỌN ĐỐI TƯỢNG NHẬP",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.red,
                           fontSize: 23,
                           fontWeight: FontWeight.bold,
                         )),
                     Text("THÔNG TIN - DỮ LIỆU",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.red,
                           fontSize: 23,
                           fontWeight: FontWeight.bold,
                         )),
@@ -83,9 +86,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     MaterialPageRoute(builder: (context) => const CivilView()))
               },
               obj: {
-                'borderColor': Colors.black,
+                'borderColor': Colors.blue,
                 'titleColor': Colors.black,
-                'width': MediaQuery.of(context).size.width * 0.6,
+                'width': MediaQuery.of(context).size.width * 0.7,
                 'height': 50.0,
                 'fontSize': 20.0
               },
@@ -110,9 +113,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     MaterialPageRoute(builder: (context) => const SchoolView()))
               },
               obj: {
-                'borderColor': Colors.black,
+                'borderColor': Colors.blue,
                 'titleColor': Colors.black,
-                'width': MediaQuery.of(context).size.width * 0.6,
+                'width': MediaQuery.of(context).size.width * 0.7,
                 'height': 50.0,
                 'fontSize': 20.0
               },
@@ -128,9 +131,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             const Listing(title: 'Danh sách')))
               },
               obj: {
-                'borderColor': Colors.black,
+                'borderColor': Colors.blue,
                 'titleColor': Colors.black,
-                'width': MediaQuery.of(context).size.width * 0.6,
+                'width': MediaQuery.of(context).size.width * 0.7,
                 'height': 50.0,
                 'fontSize': 20.0
               },

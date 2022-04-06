@@ -60,7 +60,7 @@ class _MyHomePageState extends State<CameraView> {
     return Column(
       children: [
         const Divider(
-          color: Colors.black,
+          color: Colors.grey,
         ),
         Container(
           margin: const EdgeInsets.all(10),
@@ -147,7 +147,7 @@ class _MyHomePageState extends State<CameraView> {
         borderType: BorderType.RRect,
         radius: const Radius.circular(12),
         padding: const EdgeInsets.all(6),
-        color: Colors.greenAccent,
+        color: Colors.blueAccent,
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(12)),
           child: SizedBox(
@@ -202,7 +202,7 @@ class _MyHomePageState extends State<CameraView> {
   Widget camview(BuildContext context) {
     return Column(children: [
       const Divider(
-        color: Colors.black,
+        color: Colors.grey,
         // height: 1,
       ),
       Container(

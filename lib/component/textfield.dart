@@ -58,15 +58,17 @@ class _MyHomePageState extends State<FieldView> {
           width: 10,
         ),
         Text(widget.obj['start'] ?? '',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
+              fontWeight: widget.obj['startStyle'] ?? FontWeight.normal,
             )),
         Container(
             alignment: Alignment.center,
-            width: widget.obj['width'] ?? 100,
+            width: widget.obj['width'] ?? 80,
             height: widget.obj['height'] ?? 35,
             margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
             child: TextField(
+              textAlign: widget.obj['textAlign'] ?? TextAlign.center,
               controller: _textController,
               obscureText: false,
               maxLength: widget.obj['limit'] ?? 2,
@@ -86,12 +88,13 @@ class _MyHomePageState extends State<FieldView> {
                 hintText: widget.obj['hintText'] ?? "",
                 hintStyle: const TextStyle(color: Colors.black),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0)),
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black),
+                  borderSide: BorderSide(color: Colors.blueAccent, width: 1.5),
                 ),
                 enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black),
+                  borderSide: BorderSide(color: Colors.blueAccent, width: 1.5),
                 ),
               ),
             )),

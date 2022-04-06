@@ -45,8 +45,14 @@ class _MyHomePageState extends State<Checker> {
             height: 25.0,
             width: 25.0,
             child: Checkbox(
+              side: MaterialStateBorderSide.resolveWith(
+                (states) =>
+                    const BorderSide(width: 1.5, color: Colors.blueAccent),
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4)),
               checkColor: Colors.white,
-              activeColor: Colors.greenAccent,
+              activeColor: Colors.blueAccent,
               value: checkedValue,
               onChanged: (bool? value) {
                 setState(() {

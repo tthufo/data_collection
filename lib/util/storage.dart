@@ -62,4 +62,20 @@ class Storing {
     result.removeAt(index);
     prefs.setStringList(name, result);
   }
+
+  void addString(string, name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(name, string);
+  }
+
+  Future<dynamic> getString(name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String result = prefs.getString(name) ?? "";
+    return result;
+  }
+
+  void delString(name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove(name);
+  }
 }
