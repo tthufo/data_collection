@@ -54,10 +54,11 @@ class _MyHomePageState extends State<CoordinateView> {
       'checked': true,
       'valid': false,
     });
-
-    setState(() {
-      loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
 
     return await Geolocator.getCurrentPosition();
   }

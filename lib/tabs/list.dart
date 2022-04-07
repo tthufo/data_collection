@@ -20,7 +20,7 @@ class Listing extends StatelessWidget {
           title: const Text("Danh sách"),
           automaticallyImplyLeading: true,
         ),
-        body: const Option());
+        body: const LoaderOverlay(child: Option()));
   }
 }
 
@@ -41,7 +41,7 @@ class _MyHomePageState extends State<Option>
   void initState() {
     super.initState();
     _initData('civil');
-    context.loaderOverlay.show();
+    // context.loaderOverlay.show();
   }
 
   void _initData(type) async {
@@ -179,7 +179,9 @@ class _MyHomePageState extends State<Option>
                   context.loaderOverlay.show();
                   if (_selectedGender == "0") {
                     _addingHouse(data, pos);
-                  } else {}
+                  } else {
+                    _addingSchool(data, pos);
+                  }
                 } else {
                   _refreshData(pos);
                 }
@@ -319,6 +321,103 @@ class _MyHomePageState extends State<Option>
     var responseObj = jsonDecode(responseString);
 
     context.loaderOverlay.hide();
+    if (response.statusCode != 200) {
+      _showToast('Server xảy ra lỗi, mời bạn thử lại sau');
+      return;
+    }
+    if (responseObj['status'] == "OK") {
+      _showToast("Cập nhật hoàn thành");
+      _refreshData(pos);
+    } else {
+      var error = responseObj['errors'][0];
+      _showToast(error['message']);
+    }
+  }
+
+  _addingSchool(data, pos) async {
+    var token = await Storing().getString('token');
+    var postUri = Uri.parse("http://gisgo.vn:8016/api/school");
+    var request = http.MultipartRequest(
+      "POST",
+      postUri,
+    );
+
+    var latLong = data['coordinate'];
+    var grade = data['grade'];
+    var schoolDetail = data['detail'];
+
+    request.headers.addAll({
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer $token',
+    });
+
+    var path = await _localPath;
+    var imagePath = '$path/${schoolDetail['schoolPicture']}';
+    var ext = imagePath.split('.').last;
+
+    request.fields['lon'] = latLong['long'];
+    request.fields['lat'] = latLong['lat'];
+
+    request.fields['ten_truong'] = grade["school"];
+
+    var gradeList = [
+      {'lvl1': '0'},
+      {'lvl2': '1'},
+      {'lvl3': '2'},
+      {'lvl4': '3'},
+      {'lvl5': '4'},
+      {'lvl6': '5'},
+      {'lvl7': '6'},
+    ];
+    for (var obj in gradeList) {
+      if (grade[obj.keys.first] == "1") {
+        request.fields['phanloai_id'] = obj.values.first;
+        break;
+      }
+    }
+
+    var conList = [
+      {'con1': '0'},
+      {'con2': '1'},
+      {'con3': '2'},
+    ];
+    for (var obj in conList) {
+      if (grade[obj.keys.first] == "1") {
+        request.fields['tinhtrang_id'] = obj.values.first;
+        break;
+      }
+    }
+
+    request.fields['so_phonghoc'] = schoolDetail['room'];
+    request.fields['so_hocsinh'] = schoolDetail['pupil'];
+    request.fields['so_hs_nam'] = schoolDetail['pupilMale'];
+    request.fields['so_hs_nu'] = schoolDetail['pupilFemale'];
+
+    request.fields['so_gv_cb'] = schoolDetail['teacher'];
+    request.fields['so_gv_cb_nam'] = schoolDetail['teacherMale'];
+    request.fields['so_gv_cb_nu'] = schoolDetail['teacherFemale'];
+
+    request.fields['so_tiepnhan'] = schoolDetail['peopleEvac'];
+    request.fields['so_tiepnhan_nam'] = schoolDetail['peopleEvacMale'];
+    request.fields['so_tiepnhan_nu'] = schoolDetail['peopleEvacFemale'];
+
+    request.files.add(http.MultipartFile.fromBytes(
+        'images', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
+        contentType: MediaType('image', ext)));
+
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+    var responseObj = jsonDecode(responseString);
+
+    context.loaderOverlay.hide();
+
+    if (response.statusCode != 200) {
+      _showToast('Server xảy ra lỗi, mời bạn thử lại sau');
+      return;
+    }
+
     if (responseObj['status'] == "OK") {
       _showToast("Cập nhật hoàn thành");
       _refreshData(pos);

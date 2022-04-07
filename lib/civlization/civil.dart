@@ -32,7 +32,7 @@ class CivilView extends StatelessWidget {
             onTap: () {
               FocusScope.of(context).requestFocus(FocusNode());
             },
-            child: const MyHomePage()));
+            child: const LoaderOverlay(child: MyHomePage())));
   }
 }
 
@@ -135,6 +135,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   _addingHouse(data) async {
+    context.loaderOverlay.show();
     var token = await Storing().getString('token');
     var postUri = Uri.parse("http://gisgo.vn:8016/api/household");
     var request = http.MultipartRequest(
@@ -219,6 +220,10 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     var responseObj = jsonDecode(responseString);
 
     context.loaderOverlay.hide();
+    if (response.statusCode != 200) {
+      _showToast('Server xảy ra lỗi, mời bạn thử lại sau');
+      return;
+    }
     if (responseObj['status'] == "OK") {
       _showToast("Cập nhật hoàn thành");
       await Storing().updateCounter('homeIndex');
@@ -376,9 +381,12 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             CoordinateView(
                 latLong: latLong,
                 onChange: (coordinate) => {
-                      setState(() {
-                        latLong = coordinate;
-                      })
+                      if (mounted)
+                        {
+                          setState(() {
+                            latLong = coordinate;
+                          })
+                        }
                     }),
             AbsorbPointer(
                 absorbing: _validCoor,
@@ -774,10 +782,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                     if (validate())
                       {
                         if (!await hasNetwork())
-                          {
-                            context.loaderOverlay.show(),
-                            _addingHouse(_mergeAll())
-                          }
+                          {_addingHouse(_mergeAll())}
                         else
                           {
                             Storing().addData(

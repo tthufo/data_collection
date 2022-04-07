@@ -30,7 +30,7 @@ class SchoolView extends StatelessWidget {
             onTap: () {
               FocusScope.of(context).requestFocus(FocusNode());
             },
-            child: const MyHomePage()));
+            child: const LoaderOverlay(child: MyHomePage())));
   }
 }
 
@@ -100,6 +100,102 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Map<String, dynamic> validOther = {
     'checkPicture': false,
   };
+
+  _addingSchool(data) async {
+    context.loaderOverlay.show();
+    var token = await Storing().getString('token');
+    var postUri = Uri.parse("http://gisgo.vn:8016/api/school");
+    var request = http.MultipartRequest(
+      "POST",
+      postUri,
+    );
+
+    var latLong = data['coordinate'];
+    var grade = data['grade'];
+    var schoolDetail = data['detail'];
+
+    request.headers.addAll({
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer $token',
+    });
+
+    var path = await _localPath;
+    var imagePath = '$path/${schoolDetail['schoolPicture']}';
+    var ext = imagePath.split('.').last;
+
+    request.fields['lon'] = latLong['long'];
+    request.fields['lat'] = latLong['lat'];
+
+    request.fields['ten_truong'] = grade["school"];
+
+    var gradeList = [
+      {'lvl1': '0'},
+      {'lvl2': '1'},
+      {'lvl3': '2'},
+      {'lvl4': '3'},
+      {'lvl5': '4'},
+      {'lvl6': '5'},
+      {'lvl7': '6'},
+    ];
+    for (var obj in gradeList) {
+      if (grade[obj.keys.first] == "1") {
+        request.fields['phanloai_id'] = obj.values.first;
+        break;
+      }
+    }
+
+    var conList = [
+      {'con1': '0'},
+      {'con2': '1'},
+      {'con3': '2'},
+    ];
+    for (var obj in conList) {
+      if (grade[obj.keys.first] == "1") {
+        request.fields['tinhtrang_id'] = obj.values.first;
+        break;
+      }
+    }
+
+    request.fields['so_phonghoc'] = schoolDetail['room'];
+    request.fields['so_hocsinh'] = schoolDetail['pupil'];
+    request.fields['so_hs_nam'] = schoolDetail['pupilMale'];
+    request.fields['so_hs_nu'] = schoolDetail['pupilFemale'];
+
+    request.fields['so_gv_cb'] = schoolDetail['teacher'];
+    request.fields['so_gv_cb_nam'] = schoolDetail['teacherMale'];
+    request.fields['so_gv_cb_nu'] = schoolDetail['teacherFemale'];
+
+    request.fields['so_tiepnhan'] = schoolDetail['peopleEvac'];
+    request.fields['so_tiepnhan_nam'] = schoolDetail['peopleEvacMale'];
+    request.fields['so_tiepnhan_nu'] = schoolDetail['peopleEvacFemale'];
+
+    request.files.add(http.MultipartFile.fromBytes(
+        'images', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
+        contentType: MediaType('image', ext)));
+
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+
+    context.loaderOverlay.hide();
+
+    if (response.statusCode != 200) {
+      _showToast('Server xảy ra lỗi, mời bạn thử lại sau');
+      return;
+    }
+    var responseObj = jsonDecode(responseString);
+
+    if (responseObj['status'] == "OK") {
+      _showToast("Cập nhật hoàn thành");
+      await Storing().updateCounter('schoolIndex');
+      getCounter();
+      _resetAll();
+    } else {
+      var error = responseObj['errors'][0];
+      _showToast(error['message']);
+    }
+  }
 
   Map<String, dynamic> _mergeAll() {
     return {
@@ -738,128 +834,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     print('state = $state');
   }
 
-  _addingSchool() async {
-    var token = await Storing().getString('token');
-    var postUri = Uri.parse("http://gisgo.vn:8016/api/school");
-    var request = http.MultipartRequest(
-      "POST",
-      postUri,
-    );
-
-    request.headers.addAll({
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      'Authorization': 'Bearer $token',
-    });
-
-    var path = await _localPath;
-    var imagePath = '$path/${schoolDetail['schoolPicture']}';
-    var ext = imagePath.split('.').last;
-
-    request.fields['tinhtrang_id'] = '1';
-
-    // request.files.add(http.MultipartFile.fromBytes(
-    //     'images', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
-    //     contentType: MediaType('image', ext)));
-
-    var response = await request.send();
-    var responseData = await response.stream.toBytes();
-    var responseString = String.fromCharCodes(responseData);
-
-    //var d = jsonDecode(responseString);
-
-    print(responseString);
-
-    // request.send().then((response) {
-    //   if (response.statusCode == 200) {
-    //     print("Uploaded!");
-    //   } else {
-    //     print(response.statusCode);
-    //   }
-    // });
-  }
-
-// {
-// 							"key": "ten_truong",
-// 							"value": "test",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "phanloai_id",
-// 							"value": "1",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "tinhtrang_id",
-// 							"value": "1",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_phonghoc",
-// 							"value": "10",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "lon",
-// 							"value": "100",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "images",
-// 							"type": "file",
-// 							"src": "/C:/Users/T470s/OneDrive - dada/Pictures/Capture.JPG"
-// 						},
-// 						{
-// 							"key": "lat",
-// 							"value": "21",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_hocsinh",
-// 							"value": "100",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_hs_nam",
-// 							"value": "50\n",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_hs_nu",
-// 							"value": "50",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_gv_cb",
-// 							"value": "10",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_gv_cb_nam",
-// 							"value": "5",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_gv_cb_nu",
-// 							"value": "5",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_tiepnhan",
-// 							"value": "100",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_tiepnhan_nam",
-// 							"value": "50",
-// 							"type": "text"
-// 						},
-// 						{
-// 							"key": "so_tiepnhan_nu",
-// 							"value": "50",
-// 							"type": "text"
-// 						}
-
   Future<bool> hasNetwork() async {
     try {
       final result = await InternetAddress.lookup('google.com');
@@ -935,8 +909,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   onClickAction: () async => {
                     if (validate())
                       {
-                        if (await hasNetwork())
-                          {}
+                        if (!await hasNetwork())
+                          {_addingSchool(_mergeAll())}
                         else
                           {
                             Storing().addData(
@@ -958,8 +932,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 ),
                 GestureDetector(
                     onTap: () {
-                      // Navigator.pop(context);
-                      _addingSchool();
+                      Navigator.pop(context);
                     },
                     child: Image.asset(
                       "images/img_home.png",
