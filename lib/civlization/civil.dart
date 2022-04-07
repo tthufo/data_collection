@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vrp_app/component/header.dart';
 import 'package:vrp_app/component/next.dart';
-import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:http_parser/http_parser.dart';
+import 'package:http/http.dart' as http;
+import 'package:loader_overlay/loader_overlay.dart';
 import '../civlization/civil_detail.dart';
 import '../component/buttoning.dart';
 import '../component/coordinate.dart';
@@ -61,26 +64,26 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   };
 
   List<dynamic> condition_1 = <dynamic>[
-    {'key': 'tinhtrang_id', 'id': 0, "title": "Hộ nghèo", 'checked': '0'},
-    {'key': 'tinhtrang_id', 'id': 1, "title": "Hộ cận nghèo", 'checked': '0'},
+    {'key': 'tinhtrang_id', 'id': '0', "title": "Hộ nghèo", 'checked': '0'},
+    {'key': 'tinhtrang_id', 'id': '1', "title": "Hộ cận nghèo", 'checked': '0'},
   ];
 
   List<dynamic> condition_2 = <dynamic>[
     {
       'key': 'tinhtrang_congtrinh_id',
-      'id': 0,
+      'id': '0',
       "title": "Nhà \nkiên cố",
       'checked': '0'
     },
     {
       'key': 'tinhtrang_congtrinh_id',
-      'id': 1,
+      'id': '1',
       "title": "Nhà bán \nkiên cố",
       'checked': '0'
     },
     {
       'key': 'tinhtrang_congtrinh_id',
-      'id': 2,
+      'id': '2',
       "title": "Nhà \nđơn sơ",
       'checked': '0'
     },
@@ -129,6 +132,102 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     return detailList[position]['birthDay'] == "" ||
         (detailList[position]['male'] == "0" &&
             detailList[position]['female'] == "0");
+  }
+
+  _addingHouse(data) async {
+    var token = await Storing().getString('token');
+    var postUri = Uri.parse("http://gisgo.vn:8016/api/household");
+    var request = http.MultipartRequest(
+      "POST",
+      postUri,
+    );
+
+    var latLong = data['coordinate'];
+    var people = data['people'];
+    var condition_1 = data['condition1'];
+    var condition_2 = data['condition2'];
+    var detailList = data['detail'];
+
+    request.headers.addAll({
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer $token',
+    });
+
+    var path = await _localPath;
+    var imagePath = '$path/${people['housePicture']}';
+    var ext = imagePath.split('.').last;
+
+    request.fields['lon'] = latLong['long'];
+    request.fields['lat'] = latLong['lat'];
+
+    var con1 = condition_1.where((item) {
+      return item['checked'] == "1";
+    });
+    if (con1.isNotEmpty) {
+      request.fields['tinhtrang_id'] = con1.first['id'];
+    }
+
+    var con2 = condition_2.where((item) {
+      return item['checked'] == "1";
+    });
+    if (con2.isNotEmpty) {
+      request.fields['tinhtrang_congtrinh_id'] = con2.first['id'];
+    }
+
+    request.fields['so_khau'] = people['peopleNo'];
+    request.fields['so_nam'] = people['maleNo'] == "" ? "0" : people['maleNo'];
+    request.fields['so_nu'] =
+        people['femaleNo'] == "" ? "0" : people['femaleNo'];
+
+    for (var item in detailList) {
+      var indexing = detailList.indexOf(item);
+      request.fields['detail[$indexing].nam_sinh'] =
+          (item['birthDay']).toString().split('/').last;
+      request.fields['detail[$indexing].chu_ho'] =
+          item['houseHold'] == "1" ? 'true' : 'false';
+      request.fields['detail[$indexing].gioi_tinh'] =
+          item['male'] == "1" ? 'true' : 'false';
+      request.fields['detail[$indexing].nu_donthan'] =
+          item['singleMom'] == "1" ? 'true' : 'false';
+      if (item['defected'] == "1") {
+        var defectList = [
+          {'vision': '0'},
+          {'mobility': '1'},
+          {'hearing': '2'},
+          {'mental': '3'},
+          {'other': '4'},
+        ];
+
+        for (var obj in defectList) {
+          if (item[obj.keys.first] == "1") {
+            request.fields['detail[$indexing].loai_khuyettat_id'] =
+                obj.values.first;
+            break;
+          }
+        }
+      }
+    }
+
+    request.files.add(http.MultipartFile.fromBytes(
+        'images', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
+        contentType: MediaType('image', ext)));
+
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+    var responseObj = jsonDecode(responseString);
+
+    context.loaderOverlay.hide();
+    if (responseObj['status'] == "OK") {
+      _showToast("Cập nhật hoàn thành");
+      await Storing().updateCounter('homeIndex');
+      getCounter();
+      _resetAll();
+    } else {
+      var error = responseObj['errors'][0];
+      _showToast(error['message']);
+    }
   }
 
   Map<String, dynamic> _mergeAll() {
@@ -194,19 +293,19 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       condition_2 = [
         {
           'key': 'tinhtrang_congtrinh_id',
-          'id': 0,
+          'id': '0',
           "title": "Nhà \nkiên cố",
           'checked': '0'
         },
         {
           'key': 'tinhtrang_congtrinh_id',
-          'id': 1,
+          'id': '1',
           "title": "Nhà bán \nkiên cố",
           'checked': '0'
         },
         {
           'key': 'tinhtrang_congtrinh_id',
-          'id': 2,
+          'id': '2',
           "title": "Nhà \nđơn sơ",
           'checked': '0'
         },
@@ -379,10 +478,11 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                       _goNext();
                     }))),
             AbsorbPointer(
-                absorbing: _validCoor ||
-                    people['peopleNo'] == "" ||
-                    _validDetail ||
-                    (position < int.parse(people['peopleNo']) - 1),
+                absorbing: //false,
+                    _validCoor ||
+                        people['peopleNo'] == "" ||
+                        _validDetail ||
+                        (position < int.parse(people['peopleNo']) - 1),
                 child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -674,7 +774,10 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                     if (validate())
                       {
                         if (!await hasNetwork())
-                          {}
+                          {
+                            context.loaderOverlay.show(),
+                            _addingHouse(_mergeAll())
+                          }
                         else
                           {
                             Storing().addData(

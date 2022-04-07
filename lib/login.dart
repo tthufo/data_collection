@@ -211,7 +211,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         child: Material(
           elevation: 5.0,
           borderRadius: BorderRadius.circular(10.0),
-          color: Colors.blue,
+          color: const Color.fromRGBO(39, 77, 158, 1),
           child: MaterialButton(
             minWidth: MediaQuery.of(context).size.width - 0,
             padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -363,12 +363,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: [
                 Container(
                     margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: const Divider(color: Colors.blue)),
+                    child: const Divider(color: Colors.grey, height: 2.0)),
                 const Text(
                     'Công cụ được quản lý bởi bản chỉ đạo quốc gia về \n PCTT và hỗ trợ UNDP, Green Climate Fund',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: Colors.grey,
+                        color: Color.fromRGBO(39, 77, 158, 1),
                         fontSize: 14,
                         fontStyle: FontStyle.italic))
               ],

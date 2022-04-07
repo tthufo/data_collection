@@ -33,7 +33,7 @@ class _MyHomePageState extends State<FieldView> {
   @override
   void dispose() {
     super.dispose();
-    _textController.dispose();
+    // _textController.dispose();
   }
 
   _resetText() {

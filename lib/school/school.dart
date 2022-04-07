@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:vrp_app/component/checker.dart';
 import 'package:vrp_app/component/header.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-
+import 'package:http_parser/http_parser.dart';
+import 'package:http/http.dart' as http;
+import 'package:loader_overlay/loader_overlay.dart';
 import '../component/buttoning.dart';
 import '../component/coordinate.dart';
 import '../component/camera.dart';
@@ -305,7 +308,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     ),
                     child: detail())),
             AbsorbPointer(
-                absorbing: _validCoor || _validHeader || _validDetail,
+                absorbing: false, //_validCoor || _validHeader || _validDetail,
                 child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
@@ -505,7 +508,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         FieldView(
             obj: {
               "width": 60.0,
-              "start": "Số phòng học    ",
+              "start": "Số phòng học   ",
               "startStyle": FontWeight.bold,
               "text": schoolDetail['room'],
               "type": TextInputType.number,
@@ -522,7 +525,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             })
       ]),
       Row(children: [
-        const SizedBox(width: 2),
+        const SizedBox(width: 0),
         FieldView(
             obj: {
               "width": 60.0,
@@ -543,45 +546,47 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               }
             })
       ]),
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        FieldView(
-            obj: {
-              "width": 60.0,
-              "pre": "Trong đó:",
-              "start": "Nam",
-              "end": "người",
-              "text": schoolDetail['pupilMale'],
-              "type": TextInputType.number,
-            },
-            onChange: (texting) {
-              if (texting.runtimeType != String) {
-                listText.add(texting);
-              } else {
-                setState(() {
-                  schoolDetail['pupilMale'] = texting;
-                  schoolDetail['valid'] = false;
-                });
-              }
-            }),
-        FieldView(
-            obj: {
-              "width": 60.0,
-              "start": "Nữ",
-              "end": "người",
-              "text": schoolDetail['pupilFemale'],
-              "type": TextInputType.number,
-            },
-            onChange: (texting) {
-              if (texting.runtimeType != String) {
-                listText.add(texting);
-              } else {
-                setState(() {
-                  schoolDetail['pupilFemale'] = texting;
-                  schoolDetail['valid'] = false;
-                });
-              }
-            })
-      ]),
+      Container(
+          margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          child: Row(children: [
+            FieldView(
+                obj: {
+                  "width": 60.0,
+                  "pre": "Trong đó:",
+                  "start": "Nam",
+                  "end": "người",
+                  "text": schoolDetail['pupilMale'],
+                  "type": TextInputType.number,
+                },
+                onChange: (texting) {
+                  if (texting.runtimeType != String) {
+                    listText.add(texting);
+                  } else {
+                    setState(() {
+                      schoolDetail['pupilMale'] = texting;
+                      schoolDetail['valid'] = false;
+                    });
+                  }
+                }),
+            FieldView(
+                obj: {
+                  "width": 60.0,
+                  "start": "Nữ",
+                  "end": "người",
+                  "text": schoolDetail['pupilFemale'],
+                  "type": TextInputType.number,
+                },
+                onChange: (texting) {
+                  if (texting.runtimeType != String) {
+                    listText.add(texting);
+                  } else {
+                    setState(() {
+                      schoolDetail['pupilFemale'] = texting;
+                      schoolDetail['valid'] = false;
+                    });
+                  }
+                })
+          ])),
       Row(children: [
         FieldView(
             obj: {
@@ -603,45 +608,47 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               }
             })
       ]),
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        FieldView(
-            obj: {
-              "width": 60.0,
-              "pre": "Trong đó:",
-              "start": "Nam",
-              "end": "người",
-              "text": schoolDetail['teacherMale'],
-              "type": TextInputType.number,
-            },
-            onChange: (texting) {
-              if (texting.runtimeType != String) {
-                listText.add(texting);
-              } else {
-                setState(() {
-                  schoolDetail['teacherMale'] = texting;
-                  schoolDetail['valid'] = false;
-                });
-              }
-            }),
-        FieldView(
-            obj: {
-              "width": 60.0,
-              "start": "Nữ",
-              "end": "người",
-              "text": schoolDetail['teacherFemale'],
-              "type": TextInputType.number,
-            },
-            onChange: (texting) {
-              if (texting.runtimeType != String) {
-                listText.add(texting);
-              } else {
-                setState(() {
-                  schoolDetail['teacherFemale'] = texting;
-                  schoolDetail['valid'] = false;
-                });
-              }
-            })
-      ]),
+      Container(
+          margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          child: Row(children: [
+            FieldView(
+                obj: {
+                  "width": 60.0,
+                  "pre": "Trong đó:",
+                  "start": "Nam",
+                  "end": "người",
+                  "text": schoolDetail['teacherMale'],
+                  "type": TextInputType.number,
+                },
+                onChange: (texting) {
+                  if (texting.runtimeType != String) {
+                    listText.add(texting);
+                  } else {
+                    setState(() {
+                      schoolDetail['teacherMale'] = texting;
+                      schoolDetail['valid'] = false;
+                    });
+                  }
+                }),
+            FieldView(
+                obj: {
+                  "width": 60.0,
+                  "start": "Nữ",
+                  "end": "người",
+                  "text": schoolDetail['teacherFemale'],
+                  "type": TextInputType.number,
+                },
+                onChange: (texting) {
+                  if (texting.runtimeType != String) {
+                    listText.add(texting);
+                  } else {
+                    setState(() {
+                      schoolDetail['teacherFemale'] = texting;
+                      schoolDetail['valid'] = false;
+                    });
+                  }
+                })
+          ])),
       Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         Container(
             padding: const EdgeInsets.all(10),
@@ -669,45 +676,47 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               }
             })
       ]),
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        FieldView(
-            obj: {
-              "width": 60.0,
-              "pre": "Trong đó:",
-              "start": "Nam",
-              "end": "người",
-              "text": schoolDetail['peopleEvacMale'],
-              "type": TextInputType.number,
-            },
-            onChange: (texting) {
-              if (texting.runtimeType != String) {
-                listText.add(texting);
-              } else {
-                setState(() {
-                  schoolDetail['peopleEvacMale'] = texting;
-                  schoolDetail['valid'] = false;
-                });
-              }
-            }),
-        FieldView(
-            obj: {
-              "width": 60.0,
-              "start": "Nữ",
-              "end": "người",
-              "text": schoolDetail['peopleEvacFemale'],
-              "type": TextInputType.number,
-            },
-            onChange: (texting) {
-              if (texting.runtimeType != String) {
-                listText.add(texting);
-              } else {
-                setState(() {
-                  schoolDetail['peopleEvacFemale'] = texting;
-                  schoolDetail['valid'] = false;
-                });
-              }
-            })
-      ]),
+      Container(
+          margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          child: Row(children: [
+            FieldView(
+                obj: {
+                  "width": 60.0,
+                  "pre": "Trong đó:",
+                  "start": "Nam",
+                  "end": "người",
+                  "text": schoolDetail['peopleEvacMale'],
+                  "type": TextInputType.number,
+                },
+                onChange: (texting) {
+                  if (texting.runtimeType != String) {
+                    listText.add(texting);
+                  } else {
+                    setState(() {
+                      schoolDetail['peopleEvacMale'] = texting;
+                      schoolDetail['valid'] = false;
+                    });
+                  }
+                }),
+            FieldView(
+                obj: {
+                  "width": 60.0,
+                  "start": "Nữ",
+                  "end": "người",
+                  "text": schoolDetail['peopleEvacFemale'],
+                  "type": TextInputType.number,
+                },
+                onChange: (texting) {
+                  if (texting.runtimeType != String) {
+                    listText.add(texting);
+                  } else {
+                    setState(() {
+                      schoolDetail['peopleEvacFemale'] = texting;
+                      schoolDetail['valid'] = false;
+                    });
+                  }
+                })
+          ])),
     ]);
   }
 
@@ -728,6 +737,128 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     print('state = $state');
   }
+
+  _addingSchool() async {
+    var token = await Storing().getString('token');
+    var postUri = Uri.parse("http://gisgo.vn:8016/api/school");
+    var request = http.MultipartRequest(
+      "POST",
+      postUri,
+    );
+
+    request.headers.addAll({
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer $token',
+    });
+
+    var path = await _localPath;
+    var imagePath = '$path/${schoolDetail['schoolPicture']}';
+    var ext = imagePath.split('.').last;
+
+    request.fields['tinhtrang_id'] = '1';
+
+    // request.files.add(http.MultipartFile.fromBytes(
+    //     'images', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
+    //     contentType: MediaType('image', ext)));
+
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+
+    //var d = jsonDecode(responseString);
+
+    print(responseString);
+
+    // request.send().then((response) {
+    //   if (response.statusCode == 200) {
+    //     print("Uploaded!");
+    //   } else {
+    //     print(response.statusCode);
+    //   }
+    // });
+  }
+
+// {
+// 							"key": "ten_truong",
+// 							"value": "test",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "phanloai_id",
+// 							"value": "1",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "tinhtrang_id",
+// 							"value": "1",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_phonghoc",
+// 							"value": "10",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "lon",
+// 							"value": "100",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "images",
+// 							"type": "file",
+// 							"src": "/C:/Users/T470s/OneDrive - dada/Pictures/Capture.JPG"
+// 						},
+// 						{
+// 							"key": "lat",
+// 							"value": "21",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_hocsinh",
+// 							"value": "100",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_hs_nam",
+// 							"value": "50\n",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_hs_nu",
+// 							"value": "50",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_gv_cb",
+// 							"value": "10",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_gv_cb_nam",
+// 							"value": "5",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_gv_cb_nu",
+// 							"value": "5",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_tiepnhan",
+// 							"value": "100",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_tiepnhan_nam",
+// 							"value": "50",
+// 							"type": "text"
+// 						},
+// 						{
+// 							"key": "so_tiepnhan_nu",
+// 							"value": "50",
+// 							"type": "text"
+// 						}
 
   Future<bool> hasNetwork() async {
     try {
@@ -827,7 +958,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 ),
                 GestureDetector(
                     onTap: () {
-                      Navigator.pop(context);
+                      // Navigator.pop(context);
+                      _addingSchool();
                     },
                     child: Image.asset(
                       "images/img_home.png",

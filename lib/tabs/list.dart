@@ -1,5 +1,9 @@
 import 'dart:convert';
-
+import 'dart:io';
+import 'package:http_parser/http_parser.dart';
+import 'package:http/http.dart' as http;
+import 'package:loader_overlay/loader_overlay.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import '../util/storage.dart';
 
@@ -37,6 +41,7 @@ class _MyHomePageState extends State<Option>
   void initState() {
     super.initState();
     _initData('civil');
+    context.loaderOverlay.show();
   }
 
   void _initData(type) async {
@@ -44,7 +49,7 @@ class _MyHomePageState extends State<Option>
     setState(() {
       rowData = list;
     });
-    print(list);
+    // print(list);
   }
 
   @override
@@ -137,7 +142,7 @@ class _MyHomePageState extends State<Option>
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Flexible(
-                                child: Text(data['coordinate']['lat'],
+                                child: Text(data['coordinate']['lat'] ?? '',
                                     maxLines: 1)),
                           ])),
                       const SizedBox(
@@ -151,7 +156,7 @@ class _MyHomePageState extends State<Option>
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Flexible(
-                                child: Text(data['coordinate']['long'],
+                                child: Text(data['coordinate']['long'] ?? '',
                                     maxLines: 1)),
                           ]))
                     ])
@@ -171,10 +176,12 @@ class _MyHomePageState extends State<Option>
               }).toList(),
               onChanged: (opt) {
                 if (opt == "Tải lên") {
+                  context.loaderOverlay.show();
+                  if (_selectedGender == "0") {
+                    _addingHouse(data, pos);
+                  } else {}
                 } else {
-                  Storing().delDataAt(
-                      pos, _selectedGender == "0" ? "civil" : "school");
-                  _initData(_selectedGender == "0" ? "civil" : "school");
+                  _refreshData(pos);
                 }
               },
             )
@@ -216,4 +223,114 @@ class _MyHomePageState extends State<Option>
 
   @override
   bool get wantKeepAlive => true;
+
+  void _refreshData(pos) {
+    Storing().delDataAt(pos, _selectedGender == "0" ? "civil" : "school");
+    _initData(_selectedGender == "0" ? "civil" : "school");
+  }
+
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  _addingHouse(data, pos) async {
+    var token = await Storing().getString('token');
+    var postUri = Uri.parse("http://gisgo.vn:8016/api/household");
+    var request = http.MultipartRequest(
+      "POST",
+      postUri,
+    );
+
+    var latLong = data['coordinate'];
+    var people = data['people'];
+    var condition_1 = data['condition1'];
+    var condition_2 = data['condition2'];
+    var detailList = data['detail'];
+
+    request.headers.addAll({
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer $token',
+    });
+
+    var path = await _localPath;
+    var imagePath = '$path/${people['housePicture']}';
+    var ext = imagePath.split('.').last;
+
+    request.fields['lon'] = latLong['long'];
+    request.fields['lat'] = latLong['lat'];
+
+    var con1 = condition_1.where((item) {
+      return item['checked'] == "1";
+    });
+    if (con1.isNotEmpty) {
+      request.fields['tinhtrang_id'] = con1.first['id'];
+    }
+
+    var con2 = condition_2.where((item) {
+      return item['checked'] == "1";
+    });
+    if (con2.isNotEmpty) {
+      request.fields['tinhtrang_congtrinh_id'] = con2.first['id'];
+    }
+
+    request.fields['so_khau'] = people['peopleNo'];
+    request.fields['so_nam'] = people['maleNo'] == "" ? "0" : people['maleNo'];
+    request.fields['so_nu'] =
+        people['femaleNo'] == "" ? "0" : people['femaleNo'];
+
+    for (var item in detailList) {
+      var indexing = detailList.indexOf(item);
+      request.fields['detail[$indexing].nam_sinh'] =
+          (item['birthDay']).toString().split('/').last;
+      request.fields['detail[$indexing].chu_ho'] =
+          item['houseHold'] == "1" ? 'true' : 'false';
+      request.fields['detail[$indexing].gioi_tinh'] =
+          item['male'] == "1" ? 'true' : 'false';
+      request.fields['detail[$indexing].nu_donthan'] =
+          item['singleMom'] == "1" ? 'true' : 'false';
+      if (item['defected'] == "1") {
+        var defectList = [
+          {'vision': '0'},
+          {'mobility': '1'},
+          {'hearing': '2'},
+          {'mental': '3'},
+          {'other': '4'},
+        ];
+
+        for (var obj in defectList) {
+          if (item[obj.keys.first] == "1") {
+            request.fields['detail[$indexing].loai_khuyettat_id'] =
+                obj.values.first;
+            break;
+          }
+        }
+      }
+    }
+
+    request.files.add(http.MultipartFile.fromBytes(
+        'images', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
+        contentType: MediaType('image', ext)));
+
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+    var responseObj = jsonDecode(responseString);
+
+    context.loaderOverlay.hide();
+    if (responseObj['status'] == "OK") {
+      _showToast("Cập nhật hoàn thành");
+      _refreshData(pos);
+    } else {
+      var error = responseObj['errors'][0];
+      _showToast(error['message']);
+    }
+  }
+
+  _showToast(mess) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mess),
+    ));
+  }
 }
