@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './component/buttoning.dart';
+import './util/storage.dart';
 import './civlization/civil.dart';
 import './school/school.dart';
 import './tabs/list.dart';
@@ -158,6 +159,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   initState() {
     WidgetsBinding.instance?.addObserver(this);
+    Storing().initCounter();
     super.initState();
   }
 

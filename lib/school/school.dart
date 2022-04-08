@@ -407,7 +407,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     ),
                     child: detail())),
             AbsorbPointer(
-                absorbing: false, //_validCoor || _validHeader || _validDetail,
+                absorbing: _validCoor || _validHeader || _validDetail,
                 child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(

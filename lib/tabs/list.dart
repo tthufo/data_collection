@@ -107,6 +107,15 @@ class _MyHomePageState extends State<Option>
     );
   }
 
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
   Widget card(object, pos) {
     var data = object['data'];
     var id = object['id'];
@@ -178,8 +187,13 @@ class _MyHomePageState extends State<Option>
                   child: Text(value),
                 );
               }).toList(),
-              onChanged: (opt) {
+              onChanged: (opt) async {
                 if (opt == "Tải lên") {
+                  if (await hasNetwork()) {
+                    _showToast(
+                        'Mạng kết nối không khả dụng, vui lòng thử lại sau.');
+                    return;
+                  }
                   context.loaderOverlay.show();
                   if (_selectedGender == "0") {
                     _addingHouse(data, pos);
