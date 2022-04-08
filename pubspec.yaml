@@ -76,6 +76,8 @@ flutter:
    - images/img_logos.png
    - images/camera.png
    - images/img_home.png
+   - images/img_bg_bg.png
+   - images/img_bg_head.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -23,8 +23,17 @@ class SchoolView extends StatelessWidget {
     return Scaffold(
         resizeToAvoidBottomInset: true, // set it to false
         appBar: AppBar(
-          title: const Text("TRƯỜNG HỌC"),
+          title: const Text(
+            "TRƯỜNG HỌC",
+            textAlign: TextAlign.center,
+          ),
           automaticallyImplyLeading: false,
+          flexibleSpace: const Image(
+            image: AssetImage('images/img_bg_head.png'),
+            height: double.infinity,
+            fit: BoxFit.cover,
+          ),
+          backgroundColor: Colors.transparent,
         ),
         body: GestureDetector(
             onTap: () {
@@ -240,10 +249,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void getCounter() async {
     Storing().initCounter();
     int? counter = await Storing().getCounter('schoolIndex');
-    print(counter);
     setState(() {
       unitNo = counter.toString();
-      print(unitNo);
     });
   }
 
@@ -541,6 +548,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         obj: {
                           "limit": 100,
                           "textAlign": TextAlign.left,
+                          "text": gradeObj['school'],
                           "width": MediaQuery.of(context).size.width * 0.72,
                         },
                         onChange: (texting) {
@@ -903,7 +911,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   obj: const {
                     'width': 60.0,
                     'height': 45.0,
-                    'bgColor': Colors.red,
+                    'bgColor': Color(0xFFC40021),
                     'titleColor': Colors.white,
                   },
                 ),

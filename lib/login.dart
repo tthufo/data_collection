@@ -21,11 +21,11 @@ class LoginView extends StatelessWidget {
               children: <Widget>[
                 Container(
                   decoration: const BoxDecoration(
-                    color: Colors.pink,
-                    // image: DecorationImage(
-                    //   image: AssetImage("images/bg_img.png"),
-                    //   fit: BoxFit.cover,
-                    // ),
+                    // color: Colors.pink,
+                    image: DecorationImage(
+                      image: AssetImage("images/img_bg_bg.png"),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const Center(
@@ -375,14 +375,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: [
                 Container(
                     margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: const Divider(color: Colors.grey, height: 2.0)),
+                    child: const Divider(
+                      color: Colors.white,
+                    )),
                 const Text(
                     'Công cụ được quản lý bởi bản chỉ đạo quốc gia về \n PCTT và hỗ trợ UNDP, Green Climate Fund',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: Color.fromRGBO(39, 77, 158, 1),
+                        color: Colors.white,
                         fontSize: 14,
-                        fontStyle: FontStyle.italic))
+                        fontStyle: FontStyle.normal))
               ],
             )),
       ],

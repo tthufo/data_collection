@@ -19,6 +19,12 @@ class Listing extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Danh sách"),
           automaticallyImplyLeading: true,
+          flexibleSpace: const Image(
+            image: AssetImage('images/img_bg_head.png'),
+            height: double.infinity,
+            fit: BoxFit.cover,
+          ),
+          backgroundColor: Colors.transparent,
         ),
         body: const LoaderOverlay(child: Option()));
   }
@@ -73,7 +79,7 @@ class _MyHomePageState extends State<Option>
                   });
                   _initData('civil');
                 },
-                activeColor: Colors.greenAccent,
+                activeColor: const Color(0xFF2B5499),
               ),
               const Text(
                 'D.Sách hộ dân',
@@ -93,7 +99,7 @@ class _MyHomePageState extends State<Option>
                   });
                   _initData('school');
                 },
-                activeColor: Colors.greenAccent,
+                activeColor: const Color(0xFF2B5499),
               ),
               const Text(
                 'D.Sách trường học',

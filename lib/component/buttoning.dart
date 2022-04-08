@@ -20,7 +20,9 @@ class Buttoning extends StatelessWidget {
   Container buttoning(String title, {required Function onClickAction}) {
     return Container(
         decoration: BoxDecoration(
-            border: Border.all(color: obj['borderColor'] ?? Colors.transparent),
+            border: Border.all(
+                color: obj['borderColor'] ?? Colors.transparent,
+                width: obj['borderWidth'] ?? 1),
             borderRadius: BorderRadius.circular(10.0)),
         margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
         child: Material(

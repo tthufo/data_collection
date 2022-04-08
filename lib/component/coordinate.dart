@@ -140,7 +140,7 @@ class _MyHomePageState extends State<CoordinateView> {
                 flex: 1,
                 child: Row(children: [
                   const Text(
-                    'K.dộ:',
+                    'K.độ:',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Flexible(child: Text(widget.latLong['lat'], maxLines: 1)),

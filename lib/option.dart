@@ -11,25 +11,25 @@ class OptionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-        ),
+        // appBar: AppBar(
+        //   automaticallyImplyLeading: false,
+        // ),
         body: Stack(
-          children: <Widget>[
-            Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                // image: DecorationImage(
-                //   image: AssetImage("images/bg_img.png"),
-                //   fit: BoxFit.cover,
-                // ),
-              ),
-            ),
-            const Center(
-              child: Center(child: MyHomePage()),
-            )
-          ],
-        ));
+      children: <Widget>[
+        Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            // image: DecorationImage(
+            //   image: AssetImage("images/bg_img.png"),
+            //   fit: BoxFit.cover,
+            // ),
+          ),
+        ),
+        const Center(
+          child: Center(child: MyHomePage()),
+        )
+      ],
+    ));
   }
 }
 
@@ -48,6 +48,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Image.asset("images/img_bg_head.png",
+                height: 80,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.cover),
             Container(
               child: const Text(""),
               color: Colors.grey,
@@ -58,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             const SizedBox(height: 15.0),
             Container(
                 width: MediaQuery.of(context).size.width,
-                color: Colors.yellow,
+                color: const Color(0xFFFFD966),
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -66,14 +70,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     Text("LỰA CHỌN ĐỐI TƯỢNG NHẬP",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.red,
+                          color: Color(0xFFC22026),
                           fontSize: 23,
                           fontWeight: FontWeight.bold,
                         )),
                     Text("THÔNG TIN - DỮ LIỆU",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.red,
+                          color: Color(0xFFC22026),
                           fontSize: 23,
                           fontWeight: FontWeight.bold,
                         )),
@@ -88,10 +92,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               },
               obj: {
                 'borderColor': Colors.blue,
+                'borderWidth': 2.0,
                 'titleColor': Colors.black,
                 'width': MediaQuery.of(context).size.width * 0.7,
                 'height': 50.0,
-                'fontSize': 20.0
+                'fontSize': 17.0
               },
             ),
             // const SizedBox(height: 25.0),
@@ -115,10 +120,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               },
               obj: {
                 'borderColor': Colors.blue,
+                'borderWidth': 2.0,
                 'titleColor': Colors.black,
                 'width': MediaQuery.of(context).size.width * 0.7,
                 'height': 50.0,
-                'fontSize': 20.0
+                'fontSize': 17.0
               },
             ),
             const SizedBox(height: 25.0),
@@ -133,10 +139,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               },
               obj: {
                 'borderColor': Colors.blue,
+                'borderWidth': 2.0,
                 'titleColor': Colors.black,
                 'width': MediaQuery.of(context).size.width * 0.7,
                 'height': 50.0,
-                'fontSize': 20.0
+                'fontSize': 17.0
               },
             ),
             // const SizedBox(height: 25.0),

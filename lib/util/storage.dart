@@ -13,18 +13,12 @@ class Storing {
 
   Future<void> initCounter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('pre');
-
-    print(prefs.getInt('homeIndex'));
     if (prefs.getInt('homeIndex') == null) {
       await prefs.setInt('homeIndex', 1);
     }
     if (prefs.getInt('schoolIndex') == null) {
       await prefs.setInt('schoolIndex', 1);
     }
-    print('post');
-
-    print(prefs.getInt('homeIndex'));
   }
 
   Future<int?> getCounter(name) async {

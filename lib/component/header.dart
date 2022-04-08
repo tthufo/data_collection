@@ -12,8 +12,8 @@ class Heading extends StatelessWidget {
 
   Container buttoning(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.all(10),
-        color: Colors.yellowAccent,
+        padding: const EdgeInsets.all(15),
+        color: const Color(0xFFFFD966),
         width: MediaQuery.of(context).size.width,
         child: obj['title'] != null
             ? Text(

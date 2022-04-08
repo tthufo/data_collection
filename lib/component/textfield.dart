@@ -18,16 +18,16 @@ class _MyHomePageState extends State<FieldView> {
   @override
   initState() {
     super.initState();
-    _textController.text = widget.obj["text"];
+    _textController.text = widget.obj["text"] ?? '';
     widget.onChange(_textController);
   }
 
   @override
   void didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.obj["text"] != widget.obj["text"]) {
-      // _textController.text = widget.obj["text"];
-    }
+    // if (oldWidget.obj["text"] != widget.obj["text"]) {
+    //   // _textController.text = widget.obj["text"];
+    // }
   }
 
   @override

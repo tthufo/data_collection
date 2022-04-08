@@ -5,7 +5,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 
 import './login.dart';
 
-void main() {
+void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
 
   // FlipperClient flipperClient = FlipperClient.getDefault();
@@ -15,6 +15,17 @@ void main() {
   // // flipperClient.addPlugin(new FlipperDatabaseBrowserPlugin());
   // flipperClient.addPlugin(FlipperReduxInspectorPlugin());
   // flipperClient.start();
+
+  /* 
+    * Additional function call to ensure widgets flutter binding is initialized,
+    * but the issue still happens if no delay task below.
+  */
+  WidgetsFlutterBinding.ensureInitialized();
+  /* 
+    * This will make splash screen lasts for the duration of the delay task.
+    * 300ms looks well for me, can adjust based on your preference.
+  */
+  await Future.delayed(const Duration(milliseconds: 600));
 
   runApp(const MyApp());
 }
