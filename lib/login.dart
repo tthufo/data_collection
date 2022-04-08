@@ -307,7 +307,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   fontSize: 14,
                 )),
             const SizedBox(height: 15.0),
-            buttoning(onClickAction: () => {_didRequestLogin()})
+            buttoning(
+                onClickAction: () => {
+                      _didRequestLogin(),
+                      FocusScope.of(context).requestFocus(FocusNode())
+                    })
           ],
         ));
   }
