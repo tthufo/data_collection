@@ -104,6 +104,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   List<dynamic> listText = <dynamic>[];
 
+  late ScrollController _scrollController;
+
   late XFile _image;
 
   Map<String, dynamic> validOther = {
@@ -357,6 +359,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     for (TextEditingController text in listText) {
       text.clear();
     }
+    FocusScope.of(context).requestFocus(FocusNode());
   }
 
   Widget body() {
@@ -830,14 +833,21 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   initState() {
     WidgetsBinding.instance?.addObserver(this);
-    super.initState();
+    _scrollController = ScrollController();
     getCounter();
+    super.initState();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance?.removeObserver(this);
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(0,
+        duration: const Duration(seconds: 1), curve: Curves.linear);
   }
 
   @override
@@ -872,6 +882,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onPressed: () {
         _resetAll();
         Navigator.pop(context);
+        _scrollToTop();
       },
     );
 
@@ -918,6 +929,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 Buttoning(
                   title: "H.Thành/Lưu",
                   onClickAction: () async => {
+                    FocusScope.of(context).requestFocus(FocusNode()),
                     if (validate())
                       {
                         if (await hasNetwork())
@@ -967,7 +979,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 Expanded(
                     flex: 9,
                     child: SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(), child: body())),
+                        controller: _scrollController,
+                        physics: const ClampingScrollPhysics(),
+                        child: body())),
                 footer(),
               ],
             )));
