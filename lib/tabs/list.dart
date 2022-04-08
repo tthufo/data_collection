@@ -76,7 +76,8 @@ class _MyHomePageState extends State<Option>
                 activeColor: Colors.greenAccent,
               ),
               const Text(
-                'Danh sách dân cư',
+                'D.Sách hộ dân',
+                maxLines: 2,
                 style: TextStyle(fontSize: 14),
               ),
             ])),
@@ -95,7 +96,10 @@ class _MyHomePageState extends State<Option>
                 activeColor: Colors.greenAccent,
               ),
               const Text(
-                'Danh sách công trình',
+                'D.Sách trường học',
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                softWrap: true,
                 style: TextStyle(fontSize: 14),
               ),
             ])),

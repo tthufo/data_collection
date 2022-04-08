@@ -36,10 +36,6 @@ class _MyHomePageState extends State<FieldView> {
     // _textController.dispose();
   }
 
-  _resetText() {
-    _textController.clear();
-  }
-
   Widget inputField() {
     return Row(
       mainAxisSize: MainAxisSize.min,

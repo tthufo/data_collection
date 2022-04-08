@@ -52,6 +52,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   bool isLogin = false;
 
+  bool _isObscure = true;
+
   static final TextEditingController _textController = TextEditingController();
 
   Future<dynamic> didRequestLogin(message) async {
@@ -131,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Widget passwordField() {
     return TextField(
-        obscureText: true,
+        obscureText: _isObscure,
         onChanged: (text) {
           setState(() {
             password = text;
@@ -141,6 +143,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         style: const TextStyle(
             fontFamily: 'Montserrat', fontSize: 17.0, color: Colors.white),
         decoration: InputDecoration(
+          suffixIcon: IconButton(
+            icon: Icon(
+              _isObscure ? Icons.visibility : Icons.visibility_off,
+            ),
+            onPressed: () {
+              setState(() {
+                _isObscure = !_isObscure;
+              });
+            },
+          ),
           filled: true,
           fillColor: Colors.white.withOpacity(0.5),
           contentPadding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),

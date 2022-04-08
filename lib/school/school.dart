@@ -238,9 +238,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void getCounter() async {
+    Storing().initCounter();
     int? counter = await Storing().getCounter('schoolIndex');
+    print(counter);
     setState(() {
       unitNo = counter.toString();
+      print(unitNo);
     });
   }
 
@@ -909,7 +912,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   onClickAction: () async => {
                     if (validate())
                       {
-                        if (!await hasNetwork())
+                        if (await hasNetwork())
                           {_addingSchool(_mergeAll())}
                         else
                           {

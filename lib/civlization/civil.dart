@@ -648,6 +648,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void getCounter() async {
+    Storing().initCounter();
     int? counter = await Storing().getCounter('homeIndex');
     setState(() {
       unitNo = counter.toString();
@@ -781,7 +782,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                   onClickAction: () async => {
                     if (validate())
                       {
-                        if (!await hasNetwork())
+                        if (await hasNetwork())
                           {_addingHouse(_mergeAll())}
                         else
                           {
