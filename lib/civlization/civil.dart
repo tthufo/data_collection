@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:vrp_app/component/header.dart';
 import 'package:vrp_app/component/next.dart';
@@ -237,6 +239,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       await Storing().updateCounter('homeIndex');
       getCounter();
       _resetAll();
+      _scrollToTop();
     } else {
       var error = responseObj['errors'][0];
       _showToast(error['message']);
@@ -375,6 +378,9 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
+  String toast =
+      'Hãy điền thông tin theo thứ tự : Nhập tọa độ -> Số người, Tình trạng hộ/nhà -> Thông tin thứ tự số người -> Ảnh chụp gia đình';
+
   Widget body() {
     return Padding(
         padding: const EdgeInsets.all(0.0),
@@ -397,140 +403,162 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                           })
                         }
                     }),
-            AbsorbPointer(
-                absorbing: _validCoor,
-                child: Container(
-                    // color: _validCoor
-                    //     ? const Color.fromARGB(20, 156, 156, 156)
-                    //     : Colors.transparent,
-                    width: double.infinity,
-                    alignment: Alignment.centerLeft,
-                    child: PeopleView(
-                        onChange: (texting) {
-                          String typing = texting['type'];
-                          if (typing == 'fieldView') {
-                            fieldView = texting['text'];
-                          } else {
-                            setState(() {
-                              people[typing] = texting['text'];
-                            });
-                          }
-                          if (typing == "peopleNo") {
-                            _resetDetailList();
-                            people['valid'] = false;
-                          }
-                        },
-                        obj: people))),
-            AbsorbPointer(
-                absorbing: _validCoor,
-                child: Container(
-                  // color: _validCoor
-                  //     ? const Color.fromARGB(20, 156, 156, 156)
-                  //     : Colors.transparent,
-                  child: checker(),
-                )),
+            GestureDetector(
+                onTap: () {
+                  if (_validCoor) {
+                    _showToast(toast);
+                  }
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: AbsorbPointer(
+                    absorbing: _validCoor,
+                    child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 0.0, sigmaY: 0.0),
+                        child: Container(
+                            width: double.infinity,
+                            alignment: Alignment.centerLeft,
+                            child: PeopleView(
+                                onChange: (texting) {
+                                  String typing = texting['type'];
+                                  if (typing == 'fieldView') {
+                                    fieldView = texting['text'];
+                                  } else {
+                                    setState(() {
+                                      people[typing] = texting['text'];
+                                    });
+                                  }
+                                  if (typing == "peopleNo") {
+                                    _resetDetailList();
+                                    people['valid'] = false;
+                                  }
+                                },
+                                obj: people))))),
+            GestureDetector(
+                onTap: () {
+                  if (_validCoor) {
+                    _showToast(toast);
+                  }
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: AbsorbPointer(
+                    absorbing: _validCoor,
+                    child: Container(
+                      child: checker(),
+                    ))),
             const Heading(obj: {
               'title': 'THÔNG TIN CHI TIẾT',
             }),
-            AbsorbPointer(
-                absorbing: _validCoor || people['peopleNo'] == "",
-                child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 2,
-                          color: !validOther['checkDetail']
-                              ? Colors.transparent
-                              : Colors.redAccent),
-                      // color: _validCoor || people['peopleNo'] == ""
-                      //     ? const Color.fromARGB(20, 156, 156, 156)
-                      //     : Colors.transparent,
-                    ),
-                    child: Detailing(
-                        obj: detailList[position],
-                        onReset: (reset) {
-                          if (reset['type'] == 'defect') {
-                            setState(() {
-                              for (String key in defectes) {
-                                detailList[position][key] = "0";
-                              }
-                            });
-                          }
-                        },
-                        onChange: (texting) {
-                          setState(() {
-                            String typing = texting['type'];
-                            if (typing == "male" || typing == "female") {
-                              _resetGender(typing);
-                              setState(() {
-                                validOther['checkDetail'] = false;
-                              });
-                            }
-                            if (defectes.contains(typing)) {
-                              _resetDefect(typing);
-                            } else {
-                              detailList[position][typing] = texting['text'];
-                              if (typing == 'birthDay') {
+            GestureDetector(
+                onTap: () {
+                  if (_validCoor || people['peopleNo'] == "") {
+                    _showToast(toast);
+                  }
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: AbsorbPointer(
+                    absorbing: _validCoor || people['peopleNo'] == "",
+                    child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              width: 2,
+                              color: !validOther['checkDetail']
+                                  ? Colors.transparent
+                                  : Colors.redAccent),
+                        ),
+                        child: Detailing(
+                            obj: detailList[position],
+                            onReset: (reset) {
+                              if (reset['type'] == 'defect') {
                                 setState(() {
-                                  validOther['checkDetail'] = false;
+                                  for (String key in defectes) {
+                                    detailList[position][key] = "0";
+                                  }
                                 });
                               }
+                            },
+                            onChange: (texting) {
+                              setState(() {
+                                String typing = texting['type'];
+                                if (typing == "male" || typing == "female") {
+                                  _resetGender(typing);
+                                  setState(() {
+                                    validOther['checkDetail'] = false;
+                                  });
+                                }
+                                if (defectes.contains(typing)) {
+                                  _resetDefect(typing);
+                                } else {
+                                  detailList[position][typing] =
+                                      texting['text'];
+                                  if (typing == 'birthDay') {
+                                    setState(() {
+                                      validOther['checkDetail'] = false;
+                                    });
+                                  }
+                                }
+                              });
+                            })))),
+            GestureDetector(
+                onTap: () {
+                  if (_validCoor || people['peopleNo'] == "" || _validDetail) {
+                    _showToast(toast);
+                  }
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: AbsorbPointer(
+                    absorbing:
+                        _validCoor || people['peopleNo'] == "" || _validDetail,
+                    child: SizedBox(
+                        width: double.infinity,
+                        height: people['peopleNo'] != "" &&
+                                int.parse(people['peopleNo']) != 0 &&
+                                int.parse(people['peopleNo']) - 1 > position
+                            ? 85
+                            : 0,
+                        child: Next(onClickAction: () {
+                          _goNext();
+                        })))),
+            GestureDetector(
+                onTap: () {
+                  if (_validCoor ||
+                      people['peopleNo'] == "" ||
+                      _validDetail ||
+                      (position < int.parse(people['peopleNo']) - 1)) {
+                    _showToast(toast);
+                  }
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: AbsorbPointer(
+                    absorbing: //false,
+                        _validCoor ||
+                            people['peopleNo'] == "" ||
+                            _validDetail ||
+                            (position < int.parse(people['peopleNo']) - 1),
+                    child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              width: 2,
+                              color: !validOther['checkPicture']
+                                  ? Colors.transparent
+                                  : Colors.redAccent),
+                        ),
+                        child: CameraView(
+                          title: 'Ảnh hộ gia đình',
+                          obj: {"picture": people['housePicture']},
+                          onClickAction: (typing) {
+                            if (typing == "1") {
+                              getCamera();
+                            } else if (typing == "2") {
+                              getGallery();
+                            } else {
+                              setState(() {
+                                people['housePicture'] = "";
+                                validOther['checkPicture'] = false;
+                              });
                             }
-                          });
-                        }))),
-            AbsorbPointer(
-                absorbing:
-                    _validCoor || people['peopleNo'] == "" || _validDetail,
-                child: Container(
-                    width: double.infinity,
-                    height: people['peopleNo'] != "" &&
-                            int.parse(people['peopleNo']) != 0 &&
-                            int.parse(people['peopleNo']) - 1 > position
-                        ? 85
-                        : 0,
-                    // color:
-                    //     _validCoor || people['peopleNo'] == "" || _validDetail
-                    //         ? const Color.fromARGB(20, 156, 156, 156)
-                    //         : Colors.transparent,
-                    child: Next(onClickAction: () {
-                      _goNext();
-                    }))),
-            AbsorbPointer(
-                absorbing: //false,
-                    _validCoor ||
-                        people['peopleNo'] == "" ||
-                        _validDetail ||
-                        (position < int.parse(people['peopleNo']) - 1),
-                child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 2,
-                          color: !validOther['checkPicture']
-                              ? Colors.transparent
-                              : Colors.redAccent),
-                      // color: _validCoor ||
-                      //         people['peopleNo'] == "" ||
-                      //         _validDetail ||
-                      //         (position < int.parse(people['peopleNo']) - 1)
-                      //     ? const Color.fromARGB(20, 156, 156, 156)
-                      //     : Colors.transparent,
-                    ),
-                    child: CameraView(
-                      title: 'Ảnh hộ gia đình',
-                      obj: {"picture": people['housePicture']},
-                      onClickAction: (typing) {
-                        if (typing == "1") {
-                          getCamera();
-                        } else if (typing == "2") {
-                          getGallery();
-                        } else {
-                          setState(() {
-                            people['housePicture'] = "";
-                            validOther['checkPicture'] = false;
-                          });
-                        }
-                      },
-                    ))),
+                          },
+                        )))),
           ],
         ));
   }
@@ -699,9 +727,10 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   _showToast(mess) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(mess),
-    ));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(mess)))
+        .closed
+        .then((value) => ScaffoldMessenger.of(context).clearSnackBars());
   }
 
   bool validate() {

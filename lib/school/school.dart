@@ -202,6 +202,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       await Storing().updateCounter('schoolIndex');
       getCounter();
       _resetAll();
+      _scrollToTop();
     } else {
       var error = responseObj['errors'][0];
       _showToast(error['message']);
@@ -362,6 +363,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
+  String toast =
+      'Hãy điền thông tin theo thứ tự : Nhập tọa độ -> Chỉ số Cấp, Tên trường, T.Trạng nhà -> Thông tin chi tiết Phòng học, Học sinh, GV/C.bộ, Số người sơ tán -> Ảnh chụp trường học';
+
   Widget body() {
     return Padding(
         padding: const EdgeInsets.all(0.0),
@@ -381,70 +385,82 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         latLong = coordinate;
                       })
                     }),
-            AbsorbPointer(
-                absorbing: _validCoor,
-                child: Container(
-                    decoration: BoxDecoration(
-                        // color: _validCoor
-                        //     ? const Color.fromARGB(20, 156, 156, 156)
-                        //     : Colors.transparent,
-                        border: Border.all(
-                            width: 2,
-                            color: gradeObj['valid'] == false
-                                ? Colors.transparent
-                                : Colors.redAccent)),
-                    child: Column(children: [
-                      level(),
-                      school(),
-                      condition(),
-                    ]))),
+            GestureDetector(
+                onTap: () {
+                  if (_validCoor) {
+                    _showToast(toast);
+                  }
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: AbsorbPointer(
+                    absorbing: _validCoor,
+                    child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 2,
+                                color: gradeObj['valid'] == false
+                                    ? Colors.transparent
+                                    : Colors.redAccent)),
+                        child: Column(children: [
+                          level(),
+                          school(),
+                          condition(),
+                        ])))),
             const Heading(obj: {
               'title': 'THÔNG TIN CHI TIẾT',
             }),
-            AbsorbPointer(
-                absorbing: _validCoor || _validHeader,
-                child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 2,
-                        color: !schoolDetail['valid']
-                            ? Colors.transparent
-                            : Colors.redAccent,
-                      ),
-                      // color: _validCoor
-                      //     ? const Color.fromARGB(20, 156, 156, 156)
-                      //     : Colors.transparent,
-                    ),
-                    child: detail())),
-            AbsorbPointer(
-                absorbing: _validCoor || _validHeader || _validDetail,
-                child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 2,
-                          color: !validOther['checkPicture']
-                              ? Colors.transparent
-                              : Colors.redAccent),
-                      // color: _validCoor
-                      //     ? const Color.fromARGB(20, 156, 156, 156)
-                      //     : Colors.transparent,
-                    ),
-                    child: CameraView(
-                      title: 'Ảnh trường học',
-                      obj: {"picture": schoolDetail['schoolPicture']},
-                      onClickAction: (typing) {
-                        if (typing == "1") {
-                          getCamera();
-                        } else if (typing == "2") {
-                          getGallery();
-                        } else {
-                          setState(() {
-                            schoolDetail['schoolPicture'] = "";
-                            validOther['checkPicture'] = false;
-                          });
-                        }
-                      },
-                    ))),
+            GestureDetector(
+                onTap: () {
+                  if (_validCoor || _validHeader) {
+                    _showToast(toast);
+                  }
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: AbsorbPointer(
+                    absorbing: _validCoor || _validHeader,
+                    child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 2,
+                            color: !schoolDetail['valid']
+                                ? Colors.transparent
+                                : Colors.redAccent,
+                          ),
+                        ),
+                        child: detail()))),
+            GestureDetector(
+                onTap: () {
+                  if (_validCoor || _validHeader || _validDetail) {
+                    _showToast(toast);
+                  }
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: AbsorbPointer(
+                    absorbing: _validCoor || _validHeader || _validDetail,
+                    child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              width: 2,
+                              color: !validOther['checkPicture']
+                                  ? Colors.transparent
+                                  : Colors.redAccent),
+                        ),
+                        child: CameraView(
+                          title: 'Ảnh trường học',
+                          obj: {"picture": schoolDetail['schoolPicture']},
+                          onClickAction: (typing) {
+                            if (typing == "1") {
+                              getCamera();
+                            } else if (typing == "2") {
+                              getGallery();
+                            } else {
+                              setState(() {
+                                schoolDetail['schoolPicture'] = "";
+                                validOther['checkPicture'] = false;
+                              });
+                            }
+                          },
+                        )))),
           ],
         ));
   }
@@ -865,9 +881,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   _showToast(mess) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(mess),
-    ));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(mess)))
+        .closed
+        .then((value) => ScaffoldMessenger.of(context).clearSnackBars());
   }
 
   showAlertDialog(BuildContext context) {
