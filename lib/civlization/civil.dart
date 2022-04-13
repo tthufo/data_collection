@@ -67,6 +67,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     'peopleNo': '',
     'maleNo': '',
     'femaleNo': '',
+    'validGender': false,
     'valid': false,
     'housePicture': '',
   };
@@ -102,6 +103,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       'birthDay': '',
       "order": "1/x",
       'valid': false,
+      'owner': false,
       'male': '0',
       'female': '0',
       'houseHold': '0',
@@ -136,6 +138,34 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   bool get _validCoor {
     return latLong['lat'] == "" || latLong['long'] == "";
+  }
+
+  bool get _validMem {
+    return people['peopleNo'] == "" || people['peopleNo'] == "0";
+  }
+
+  bool get _validPeople {
+    var con1 = condition_1.where((item) {
+      return item['checked'] == "1";
+    });
+    var con2 = condition_2.where((item) {
+      return item['checked'] == "1";
+    });
+    return con1.isEmpty || con2.isEmpty || _validMem;
+  }
+
+  bool get _validGender {
+    bool validing = false;
+    if (people['maleNo'] == "" || people['femaleNo'] == "") {
+      return true;
+    }
+
+    if (int.parse(people['maleNo']) + int.parse(people['femaleNo']) !=
+        int.parse(people['peopleNo'])) {
+      validing = true;
+    }
+
+    return validing;
   }
 
   bool get _validDetail {
@@ -262,8 +292,9 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       detailList = [
         {
           'birthDay': '',
-          "order": "1/${people['peopleNo'] == "" ? "x" : people['peopleNo']}",
+          "order": "1/${_validMem ? "x" : people['peopleNo']}",
           'valid': false,
+          'owner': false,
           'male': '0',
           'female': '0',
           'houseHold': '0',
@@ -293,6 +324,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
         'maleNo': '',
         'femaleNo': '',
         'valid': false,
+        'validGender': false,
         'housePicture': '',
       };
 
@@ -334,6 +366,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
           'birthDay': '',
           "order": "${position + 1}/x",
           'valid': false,
+          'owner': false,
           'male': '0',
           'female': '0',
           'houseHold': '0',
@@ -358,11 +391,16 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     setState(() {
       position += 1;
 
+      var checkOwner = detailList.where((item) {
+        return item['houseHold'] == "1";
+      });
+
       detailList.add(
         {
           'birthDay': '',
           "order": "${position + 1}/${people['peopleNo']}",
           'valid': false,
+          'owner': checkOwner.isNotEmpty,
           'male': '0',
           'female': '0',
           'houseHold': '0',
@@ -425,11 +463,16 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                                   } else {
                                     setState(() {
                                       people[typing] = texting['text'];
+                                      people['valid'] = false;
+                                      people['validGender'] = false;
                                     });
                                   }
                                   if (typing == "peopleNo") {
                                     _resetDetailList();
-                                    people['valid'] = false;
+                                    setState(() {
+                                      people['valid'] = false;
+                                      people['validGender'] = false;
+                                    });
                                   }
                                 },
                                 obj: people))))),
@@ -443,6 +486,27 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                 child: AbsorbPointer(
                     absorbing: _validCoor,
                     child: Container(
+                      decoration: BoxDecoration(
+                          border: Border(
+                        left: BorderSide(
+                          color: people['valid'] == false
+                              ? Colors.transparent
+                              : Colors.redAccent,
+                          width: 2.0,
+                        ),
+                        bottom: BorderSide(
+                          color: people['valid'] == false
+                              ? Colors.transparent
+                              : Colors.redAccent,
+                          width: 2.0,
+                        ),
+                        right: BorderSide(
+                          color: people['valid'] == false
+                              ? Colors.transparent
+                              : Colors.redAccent,
+                          width: 2.0,
+                        ),
+                      )),
                       child: checker(),
                     ))),
             const Heading(obj: {
@@ -450,13 +514,13 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             }),
             GestureDetector(
                 onTap: () {
-                  if (_validCoor || people['peopleNo'] == "") {
+                  if (_validCoor || _validPeople || _validGender) {
                     _showToast(toast);
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
                 child: AbsorbPointer(
-                    absorbing: _validCoor || people['peopleNo'] == "",
+                    absorbing: _validCoor || _validPeople || _validGender,
                     child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -473,6 +537,11 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                                   for (String key in defectes) {
                                     detailList[position][key] = "0";
                                   }
+                                });
+                              }
+                              if (reset['type'] == 'gender') {
+                                setState(() {
+                                  detailList[position]["singleMom"] = "0";
                                 });
                               }
                             },
@@ -500,14 +569,19 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                             })))),
             GestureDetector(
                 onTap: () {
-                  if (_validCoor || people['peopleNo'] == "" || _validDetail) {
+                  if (_validCoor ||
+                      _validPeople ||
+                      _validGender ||
+                      _validDetail) {
                     _showToast(toast);
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
                 child: AbsorbPointer(
-                    absorbing:
-                        _validCoor || people['peopleNo'] == "" || _validDetail,
+                    absorbing: _validCoor ||
+                        _validPeople ||
+                        _validGender ||
+                        _validDetail,
                     child: SizedBox(
                         width: double.infinity,
                         height: people['peopleNo'] != "" &&
@@ -521,7 +595,8 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             GestureDetector(
                 onTap: () {
                   if (_validCoor ||
-                      people['peopleNo'] == "" ||
+                      _validPeople ||
+                      _validGender ||
                       _validDetail ||
                       (position < int.parse(people['peopleNo']) - 1)) {
                     _showToast(toast);
@@ -531,7 +606,8 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                 child: AbsorbPointer(
                     absorbing: //false,
                         _validCoor ||
-                            people['peopleNo'] == "" ||
+                            _validPeople ||
+                            _validGender ||
                             _validDetail ||
                             (position < int.parse(people['peopleNo']) - 1),
                     child: Container(
@@ -575,6 +651,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
           con['checked'] = "0";
         }
       }
+      people['valid'] = false;
     });
   }
 
@@ -734,16 +811,23 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   bool validate() {
-    if (latLong['lat'] == "" || latLong['long'] == "") {
+    if (_validCoor) {
       setState(() {
         latLong['valid'] = true;
       });
       return false;
     }
 
-    if (people['peopleNo'] == "") {
+    if (_validPeople) {
       setState(() {
         people['valid'] = true;
+      });
+      return false;
+    }
+
+    if (_validGender) {
+      setState(() {
+        people['validGender'] = true;
       });
       return false;
     }

@@ -195,7 +195,7 @@ class _MyHomePageState extends State<Option>
               }).toList(),
               onChanged: (opt) async {
                 if (opt == "Tải lên") {
-                  if (await hasNetwork()) {
+                  if (!await hasNetwork()) {
                     _showToast(
                         'Mạng kết nối không khả dụng, vui lòng thử lại sau.');
                     return;

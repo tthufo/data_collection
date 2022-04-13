@@ -46,20 +46,25 @@ class _MyHomePageState extends State<Checker> {
             width: 25.0,
             child: Checkbox(
               side: MaterialStateBorderSide.resolveWith(
-                (states) =>
-                    const BorderSide(width: 1.5, color: Colors.blueAccent),
+                (states) => BorderSide(
+                    width: 1.5,
+                    color: widget.obj["disable"] == true
+                        ? Colors.grey
+                        : Colors.blueAccent),
               ),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4)),
               checkColor: Colors.white,
               activeColor: Colors.blueAccent,
               value: checkedValue,
-              onChanged: (bool? value) {
-                setState(() {
-                  checkedValue = !checkedValue;
-                });
-                widget.onChange(value == true ? "1" : "0");
-              },
+              onChanged: widget.obj["disable"] == true
+                  ? null
+                  : (bool? value) {
+                      setState(() {
+                        checkedValue = !checkedValue;
+                      });
+                      widget.onChange(value == true ? "1" : "0");
+                    },
             )),
         const SizedBox(
           width: 5,
@@ -67,7 +72,10 @@ class _MyHomePageState extends State<Checker> {
         Text(
           widget.obj['title'] ?? '',
           maxLines: 2,
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(
+              fontSize: 14,
+              color:
+                  widget.obj["disable"] == true ? Colors.grey : Colors.black),
         ),
       ],
     );

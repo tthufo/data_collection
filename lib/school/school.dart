@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vrp_app/component/checker.dart';
 import 'package:vrp_app/component/header.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -88,6 +89,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     'peopleEvacFemale': '',
     'schoolPicture': '',
     'valid': false,
+  };
+
+  Map<String, dynamic> schoolDetailValid = {
+    'validPupil': false,
+    'validTeacher': false,
+    'validPeople': false,
   };
 
   var gradeKey = [
@@ -218,7 +225,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   bool validate() {
-    if (latLong['lat'] == "" || latLong['long'] == "") {
+    if (_validCoor) {
       setState(() {
         latLong['valid'] = true;
       });
@@ -235,6 +242,27 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     if (_validDetail) {
       setState(() {
         schoolDetail['valid'] = true;
+      });
+      return false;
+    }
+
+    if (_validPupil) {
+      setState(() {
+        schoolDetailValid['validPupil'] = true;
+      });
+      return false;
+    }
+
+    if (_validTeacher) {
+      setState(() {
+        schoolDetailValid['validTeacher'] = true;
+      });
+      return false;
+    }
+
+    if (_validPeople) {
+      setState(() {
+        schoolDetailValid['validPeople'] = true;
       });
       return false;
     }
@@ -308,6 +336,67 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         gradeObj['school'] == '';
   }
 
+// 'room': '',
+//     'pupil': '',
+//     'pupilMale': '',
+//     'pupilFemale': '',
+//     'teacher': '',
+//     'teacherMale': '',
+//     'teacherFemale': '',
+//     'peopleEvac': '',
+//     'peopleEvacMale': '',
+//     'peopleEvacFemale': '',
+//     'schoolPicture': '',
+//     'valid': false,
+
+  bool get _validPupil {
+    if (schoolDetail['pupilMale'] == "" || schoolDetail['pupilFemale'] == "") {
+      return true;
+    }
+
+    if (int.parse(schoolDetail['pupilMale']) +
+            int.parse(schoolDetail['pupilFemale']) !=
+        int.parse(schoolDetail['pupil'])) {
+      return true;
+    }
+
+    return false;
+  }
+
+  bool get _validTeacher {
+    if (schoolDetail['teacherMale'] == "" ||
+        schoolDetail['teacherFemale'] == "") {
+      return true;
+    }
+
+    if (int.parse(schoolDetail['teacherMale']) +
+            int.parse(schoolDetail['teacherFemale']) !=
+        int.parse(schoolDetail['teacher'])) {
+      return true;
+    }
+
+    return false;
+  }
+
+  bool get _validPeople {
+    if (schoolDetail['peopleEvacMale'] == "" ||
+        schoolDetail['peopleEvacFemale'] == "") {
+      return true;
+    }
+
+    if (int.parse(schoolDetail['peopleEvacMale']) +
+            int.parse(schoolDetail['peopleEvacFemale']) !=
+        int.parse(schoolDetail['peopleEvac'])) {
+      return true;
+    }
+
+    return false;
+  }
+
+  bool get _validNumber {
+    return _validPupil || _validTeacher || _validPeople;
+  }
+
   bool get _validDetail {
     for (var key in schoolDetail.keys) {
       if (schoolDetail[key] == "" && key != "schoolPicture" && key != "valid") {
@@ -324,6 +413,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         'long': '',
         'checked': false,
         'valid': false,
+      };
+
+      schoolDetailValid = {
+        'validPupil': false,
+        'validTeacher': false,
+        'validPeople': false,
       };
 
       schoolDetail = {
@@ -430,13 +525,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         child: detail()))),
             GestureDetector(
                 onTap: () {
-                  if (_validCoor || _validHeader || _validDetail) {
+                  if (_validCoor ||
+                      _validHeader ||
+                      _validDetail ||
+                      _validNumber) {
                     _showToast(toast);
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
                 child: AbsorbPointer(
-                    absorbing: _validCoor || _validHeader || _validDetail,
+                    absorbing: _validCoor ||
+                        _validHeader ||
+                        _validDetail ||
+                        _validNumber,
                     child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -566,6 +667,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     child: FieldView(
                         obj: {
                           "limit": 100,
+                          "format": [
+                            FilteringTextInputFormatter.singleLineFormatter
+                          ],
                           "textAlign": TextAlign.left,
                           "text": gradeObj['school'],
                           "width": MediaQuery.of(context).size.width * 0.72,
@@ -668,12 +772,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 setState(() {
                   schoolDetail['pupil'] = texting;
                   schoolDetail['valid'] = false;
+                  schoolDetailValid['validPupil'] = false;
                 });
               }
             })
       ]),
       Container(
-          margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          decoration: BoxDecoration(
+              border: Border.all(
+                  width: 2,
+                  color: schoolDetailValid['validPupil'] == false
+                      ? Colors.transparent
+                      : Colors.redAccent)),
+          margin: const EdgeInsets.fromLTRB(8, 0, 6, 0),
           child: Row(children: [
             FieldView(
                 obj: {
@@ -691,6 +802,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     setState(() {
                       schoolDetail['pupilMale'] = texting;
                       schoolDetail['valid'] = false;
+                      schoolDetailValid['validPupil'] = false;
                     });
                   }
                 }),
@@ -709,6 +821,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     setState(() {
                       schoolDetail['pupilFemale'] = texting;
                       schoolDetail['valid'] = false;
+                      schoolDetailValid['validPupil'] = false;
                     });
                   }
                 })
@@ -730,12 +843,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 setState(() {
                   schoolDetail['teacher'] = texting;
                   schoolDetail['valid'] = false;
+                  schoolDetailValid['validTeacher'] = false;
                 });
               }
             })
       ]),
       Container(
-          margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          decoration: BoxDecoration(
+              border: Border.all(
+                  width: 2,
+                  color: schoolDetailValid['validTeacher'] == false
+                      ? Colors.transparent
+                      : Colors.redAccent)),
+          margin: const EdgeInsets.fromLTRB(8, 0, 6, 0),
           child: Row(children: [
             FieldView(
                 obj: {
@@ -753,6 +873,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     setState(() {
                       schoolDetail['teacherMale'] = texting;
                       schoolDetail['valid'] = false;
+                      schoolDetailValid['validTeacher'] = false;
                     });
                   }
                 }),
@@ -771,6 +892,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     setState(() {
                       schoolDetail['teacherFemale'] = texting;
                       schoolDetail['valid'] = false;
+                      schoolDetailValid['validTeacher'] = false;
                     });
                   }
                 })
@@ -798,12 +920,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 setState(() {
                   schoolDetail['peopleEvac'] = texting;
                   schoolDetail['valid'] = false;
+                  schoolDetailValid['validPeople'] = false;
                 });
               }
             })
       ]),
       Container(
-          margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+          decoration: BoxDecoration(
+              border: Border.all(
+                  width: 2,
+                  color: schoolDetailValid['validPeople'] == false
+                      ? Colors.transparent
+                      : Colors.redAccent)),
+          margin: const EdgeInsets.fromLTRB(8, 0, 6, 0),
           child: Row(children: [
             FieldView(
                 obj: {
@@ -821,6 +950,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     setState(() {
                       schoolDetail['peopleEvacMale'] = texting;
                       schoolDetail['valid'] = false;
+                      schoolDetailValid['validPeople'] = false;
                     });
                   }
                 }),
@@ -839,6 +969,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     setState(() {
                       schoolDetail['peopleEvacFemale'] = texting;
                       schoolDetail['valid'] = false;
+                      schoolDetailValid['validPeople'] = false;
                     });
                   }
                 })

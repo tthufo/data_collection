@@ -131,12 +131,14 @@ class _MyHomePageState extends State<Detailing> {
             obj: {'title': 'Nam', 'checked': widget.obj['male']},
             onChange: (selectedItem) {
               widget.onChange({'text': selectedItem, "type": 'male'});
+              widget.onReset({'type': 'gender'});
             },
           ),
           Checker(
             obj: {'title': 'Nữ', 'checked': widget.obj['female']},
             onChange: (selectedItem) {
               widget.onChange({'text': selectedItem, "type": 'female'});
+              widget.onReset({'type': 'gender'});
             },
           )
         ],
@@ -158,6 +160,7 @@ class _MyHomePageState extends State<Detailing> {
               children: [
                 Checker(
                   obj: {
+                    'disable': widget.obj['owner'],
                     'title': 'Là chủ hộ',
                     'checked': widget.obj['houseHold']
                   },
@@ -168,6 +171,7 @@ class _MyHomePageState extends State<Detailing> {
                 ),
                 Checker(
                   obj: {
+                    'disable': widget.obj['female'] != "1",
                     'title': 'Là phụ nữ đơn thân',
                     'checked': widget.obj['singleMom']
                   },
@@ -256,8 +260,8 @@ class _MyHomePageState extends State<Detailing> {
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
-        firstDate: DateTime(1900, 8),
-        lastDate: DateTime(2101));
+        firstDate: DateTime(1900),
+        lastDate: DateTime.now());
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;

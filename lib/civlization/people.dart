@@ -35,6 +35,7 @@ class _MyPeoplePageState extends State<PeopleView> {
           alignment: Alignment.centerLeft,
           child: FieldView(
               obj: {
+                "limit": 2,
                 "start": "Số người",
                 "startStyle": FontWeight.bold,
                 "end": "người",
@@ -51,53 +52,63 @@ class _MyPeoplePageState extends State<PeopleView> {
         ),
         SizedBox(
           width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              FieldView(
-                  obj: {
-                    "pre": "Trong đó:",
-                    "start": "Nam",
-                    "end": "người",
-                    "text": widget.obj['maleNo'],
-                    "type": TextInputType.number,
-                  },
-                  onChange: (texting) {
-                    if (texting.runtimeType != String) {
-                      listText.add(texting);
-                    } else {
-                      widget.onChange({'text': texting, 'type': 'maleNo'});
-                    }
-                  }),
-              FieldView(
-                  obj: {
-                    "pre": "Trong đó:",
-                    "hiddenPre": "1",
-                    "start": "   Nữ",
-                    "end": "người",
-                    "text": widget.obj['femaleNo'],
-                    "type": TextInputType.number,
-                  },
-                  onChange: (texting) {
-                    if (texting.runtimeType != String) {
-                      listText.add(texting);
-                    } else {
-                      widget.onChange({'text': texting, 'type': 'femaleNo'});
-                    }
-                  }),
-              // Buttoning(
-              //   title: "Nhận tọa độ",
-              //   onClickAction: () => {
-              //     for (TextEditingController text in listText) {text.clear()}
-              //   },
-              //   obj: const {
-              //     'borderColor': Colors.greenAccent,
-              //     'titleColor': Colors.black,
-              //   },
-              // ),
-            ],
-          ),
+          child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(
+                      width: 2,
+                      color: widget.obj['validGender'] == false
+                          ? Colors.transparent
+                          : Colors.redAccent)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  FieldView(
+                      obj: {
+                        "limit": 2,
+                        "pre": "Trong đó:",
+                        "start": "Nam",
+                        "end": "người",
+                        "text": widget.obj['maleNo'],
+                        "type": TextInputType.number,
+                      },
+                      onChange: (texting) {
+                        if (texting.runtimeType != String) {
+                          listText.add(texting);
+                        } else {
+                          widget.onChange({'text': texting, 'type': 'maleNo'});
+                        }
+                      }),
+                  FieldView(
+                      obj: {
+                        "limit": 2,
+                        "pre": "Trong đó:",
+                        "hiddenPre": "1",
+                        "start": "   Nữ",
+                        "end": "người",
+                        "text": widget.obj['femaleNo'],
+                        "type": TextInputType.number,
+                      },
+                      onChange: (texting) {
+                        if (texting.runtimeType != String) {
+                          listText.add(texting);
+                        } else {
+                          widget
+                              .onChange({'text': texting, 'type': 'femaleNo'});
+                        }
+                      }),
+                  // Buttoning(
+                  //   title: "Nhận tọa độ",
+                  //   onClickAction: () => {
+                  //     for (TextEditingController text in listText) {text.clear()}
+                  //   },
+                  //   obj: const {
+                  //     'borderColor': Colors.greenAccent,
+                  //     'titleColor': Colors.black,
+                  //   },
+                  // ),
+                ],
+              )),
         ),
         // checker(),
       ],
@@ -147,11 +158,26 @@ class _MyPeoplePageState extends State<PeopleView> {
         width: double.infinity,
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(
-            border: Border.all(
-                width: 2,
-                color: widget.obj['valid'] == false
-                    ? Colors.transparent
-                    : Colors.redAccent)),
+            border: Border(
+          left: BorderSide(
+            color: widget.obj['valid'] == false
+                ? Colors.transparent
+                : Colors.redAccent,
+            width: 2.0,
+          ),
+          top: BorderSide(
+            color: widget.obj['valid'] == false
+                ? Colors.transparent
+                : Colors.redAccent,
+            width: 2.0,
+          ),
+          right: BorderSide(
+            color: widget.obj['valid'] == false
+                ? Colors.transparent
+                : Colors.redAccent,
+            width: 2.0,
+          ),
+        )),
         child: header());
   }
 }

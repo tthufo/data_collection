@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class FieldView extends StatefulWidget {
   final Function(dynamic) onChange;
@@ -14,12 +15,27 @@ class FieldView extends StatefulWidget {
 
 class _MyHomePageState extends State<FieldView> {
   final TextEditingController _textController = TextEditingController();
+  final FocusNode _focus = FocusNode();
 
   @override
   initState() {
     super.initState();
     _textController.text = widget.obj["text"] ?? '';
+    _focus.addListener(_onFocusChange);
     widget.onChange(_textController);
+  }
+
+  void _onFocusChange() {
+    if (_focus.hasFocus.toString() == "false") {
+      String formated = _textController.text == ""
+          ? '0'
+          : _textController.text.replaceFirst(RegExp(r'^0+'), "") == ""
+              ? "0"
+              : _textController.text.replaceFirst(RegExp(r'^0+'), "");
+
+      widget.onChange(formated);
+      _textController.text = formated;
+    }
   }
 
   @override
@@ -64,11 +80,14 @@ class _MyHomePageState extends State<FieldView> {
             height: widget.obj['height'] ?? 35,
             margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
             child: TextField(
+              focusNode: _focus,
               textAlign: widget.obj['textAlign'] ?? TextAlign.center,
               controller: _textController,
               obscureText: false,
-              maxLength: widget.obj['limit'] ?? 2,
+              maxLength: widget.obj['limit'] ?? 4,
               keyboardType: widget.obj['type'] ?? TextInputType.text,
+              inputFormatters: widget.obj['format'] ??
+                  [FilteringTextInputFormatter.digitsOnly],
               onChanged: (text) {
                 widget.onChange(text);
               },

@@ -153,12 +153,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             //   obj: {
             //     'borderColor': Colors.black,
             //     'titleColor': Colors.black,
-            //     'width': MediaQuery.of(context).size.width * 0.6,
+            //     'width': MediaQuery.of(context).size.width * 0.7,
             //     'height': 50.0,
-            //     'fontSize': 20.0
+            //     'fontSize': 17.0
             //   },
             // ),
-            // const SizedBox(height: 25.0),
+            const SizedBox(height: 25.0),
           ],
         ));
   }
