@@ -20,11 +20,14 @@ void main() async {
     * Additional function call to ensure widgets flutter binding is initialized,
     * but the issue still happens if no delay task below.
   */
+
   WidgetsFlutterBinding.ensureInitialized();
+
   /* 
     * This will make splash screen lasts for the duration of the delay task.
     * 300ms looks well for me, can adjust based on your preference.
   */
+
   await Future.delayed(const Duration(milliseconds: 600));
 
   runApp(const MyApp());

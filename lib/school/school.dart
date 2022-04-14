@@ -17,7 +17,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 class SchoolView extends StatelessWidget {
-  const SchoolView({Key? key}) : super(key: key);
+  final String edit;
+  const SchoolView({Key? key, required this.edit}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +41,13 @@ class SchoolView extends StatelessWidget {
             onTap: () {
               FocusScope.of(context).requestFocus(FocusNode());
             },
-            child: const LoaderOverlay(child: MyHomePage())));
+            child: LoaderOverlay(child: MyHomePage(edit: edit))));
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  final String edit;
+  const MyHomePage({Key? key, required this.edit}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -279,10 +281,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   void getCounter() async {
     Storing().initCounter();
-    int? counter = await Storing().getCounter('schoolIndex');
-    setState(() {
-      unitNo = counter.toString();
-    });
+    if (widget.edit != "-1") {
+      setState(() {
+        unitNo = widget.edit;
+      });
+      _editAll();
+    } else {
+      int? counter = await Storing().getCounter('schoolIndex');
+      setState(() {
+        unitNo = counter.toString();
+      });
+    }
   }
 
   Future getCamera() async {
@@ -335,19 +344,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         conditionList.isEmpty ||
         gradeObj['school'] == '';
   }
-
-// 'room': '',
-//     'pupil': '',
-//     'pupilMale': '',
-//     'pupilFemale': '',
-//     'teacher': '',
-//     'teacherMale': '',
-//     'teacherFemale': '',
-//     'peopleEvac': '',
-//     'peopleEvacMale': '',
-//     'peopleEvacFemale': '',
-//     'schoolPicture': '',
-//     'valid': false,
 
   bool get _validPupil {
     if (schoolDetail['pupilMale'] == "" || schoolDetail['pupilFemale'] == "") {
@@ -406,6 +402,39 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return false;
   }
 
+  _editAll() async {
+    var val =
+        await Storing().getDataAt(int.parse(widget.edit) - 1, 'school') ?? [];
+    var data = jsonDecode(val)['data'];
+
+    setState(() {
+      latLong = data['coordinate'];
+
+      schoolDetail = data['detail'];
+
+      gradeObj = data['grade'];
+    });
+
+    for (var text in listText) {
+      TextEditingController textField = text['text'];
+      for (var key in latLong.keys) {
+        if (key == text['key']) {
+          textField.text = latLong[key];
+        }
+      }
+      for (var key in schoolDetail.keys) {
+        if (key == text['key']) {
+          textField.text = latLong[key];
+        }
+      }
+      for (var key in gradeObj.keys) {
+        if (key == text['key']) {
+          textField.text = latLong[key];
+        }
+      }
+    }
+  }
+
   _resetAll() {
     setState(() {
       latLong = {
@@ -452,8 +481,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       };
     });
 
-    for (TextEditingController text in listText) {
-      text.clear();
+    for (var text in listText) {
+      TextEditingController textField = text['text'];
+      textField.clear();
     }
     FocusScope.of(context).requestFocus(FocusNode());
   }
@@ -676,7 +706,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         },
                         onChange: (texting) {
                           if (texting.runtimeType != String) {
-                            listText.add(texting);
+                            listText.add({"text": texting, "key": "school"});
                           } else {
                             setState(() {
                               gradeObj['school'] = texting;
@@ -745,7 +775,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             },
             onChange: (texting) {
               if (texting.runtimeType != String) {
-                listText.add(texting);
+                listText.add({"text": texting, "key": "room"});
               } else {
                 setState(() {
                   schoolDetail['room'] = texting;
@@ -767,7 +797,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             },
             onChange: (texting) {
               if (texting.runtimeType != String) {
-                listText.add(texting);
+                listText.add({"text": texting, "key": "pupil"});
               } else {
                 setState(() {
                   schoolDetail['pupil'] = texting;
@@ -797,7 +827,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 },
                 onChange: (texting) {
                   if (texting.runtimeType != String) {
-                    listText.add(texting);
+                    listText.add({"text": texting, "key": "pupilMale"});
                   } else {
                     setState(() {
                       schoolDetail['pupilMale'] = texting;
@@ -816,7 +846,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 },
                 onChange: (texting) {
                   if (texting.runtimeType != String) {
-                    listText.add(texting);
+                    listText.add({"text": texting, "key": "pupilFemale"});
                   } else {
                     setState(() {
                       schoolDetail['pupilFemale'] = texting;
@@ -838,7 +868,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             },
             onChange: (texting) {
               if (texting.runtimeType != String) {
-                listText.add(texting);
+                listText.add({"text": texting, "key": "teacher"});
               } else {
                 setState(() {
                   schoolDetail['teacher'] = texting;
@@ -868,7 +898,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 },
                 onChange: (texting) {
                   if (texting.runtimeType != String) {
-                    listText.add(texting);
+                    listText.add({"text": texting, "key": "teacherMale"});
                   } else {
                     setState(() {
                       schoolDetail['teacherMale'] = texting;
@@ -887,7 +917,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 },
                 onChange: (texting) {
                   if (texting.runtimeType != String) {
-                    listText.add(texting);
+                    listText.add({"text": texting, "key": "teacherFemale"});
                   } else {
                     setState(() {
                       schoolDetail['teacherFemale'] = texting;
@@ -915,7 +945,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             },
             onChange: (texting) {
               if (texting.runtimeType != String) {
-                listText.add(texting);
+                listText.add({"text": texting, "key": "peopleEvac"});
               } else {
                 setState(() {
                   schoolDetail['peopleEvac'] = texting;
@@ -945,7 +975,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 },
                 onChange: (texting) {
                   if (texting.runtimeType != String) {
-                    listText.add(texting);
+                    listText.add({"text": texting, "key": "peopleEvacMale"});
                   } else {
                     setState(() {
                       schoolDetail['peopleEvacMale'] = texting;
@@ -964,7 +994,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 },
                 onChange: (texting) {
                   if (texting.runtimeType != String) {
-                    listText.add(texting);
+                    listText.add({"text": texting, "key": "peopleEvacFemale"});
                   } else {
                     setState(() {
                       schoolDetail['peopleEvacFemale'] = texting;
@@ -1089,6 +1119,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             await Storing().updateCounter('schoolIndex'),
                             getCounter(),
                             _resetAll(),
+                            _scrollToTop(),
                             _showToast(
                                 'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet')
                           }

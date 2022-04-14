@@ -115,8 +115,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             Buttoning(
               title: "TRƯỜNG HỌC",
               onClickAction: () => {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const SchoolView()))
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SchoolView(edit: "-1")))
               },
               obj: {
                 'borderColor': Colors.blue,

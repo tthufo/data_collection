@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
+import '../school/school.dart';
 import '../util/storage.dart';
 
 class Listing extends StatelessWidget {
@@ -187,7 +188,8 @@ class _MyHomePageState extends State<Option>
                 Icons.more_vert,
                 color: Colors.black,
               ),
-              items: <String>['Tải lên', 'Xóa'].map((String value) {
+              items:
+                  <String>['Tải lên', 'Chỉnh sửa', 'Xóa'].map((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -206,6 +208,11 @@ class _MyHomePageState extends State<Option>
                   } else {
                     _addingSchool(data, pos);
                   }
+                } else if (opt == "Chỉnh sửa") {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SchoolView(edit: id)));
                 } else {
                   _refreshData(pos);
                 }

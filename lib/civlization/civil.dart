@@ -922,6 +922,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                             await Storing().updateCounter('homeIndex'),
                             getCounter(),
                             _resetAll(),
+                            _scrollToTop(),
                             _showToast(
                                 'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet')
                           }
