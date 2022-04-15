@@ -978,7 +978,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                     FocusScope.of(context).requestFocus(FocusNode()),
                     if (validate())
                       {
-                        if (!await hasNetwork())
+                        if (await hasNetwork())
                           {_addingHouse(_mergeAll())}
                         else
                           {
