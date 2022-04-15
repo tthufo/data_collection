@@ -20,7 +20,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CivilView extends StatelessWidget {
-  const CivilView({Key? key}) : super(key: key);
+  final String edit;
+  final Function(Map<String, dynamic>) onRefresh;
+
+  const CivilView({Key? key, required this.edit, required this.onRefresh})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +44,17 @@ class CivilView extends StatelessWidget {
             onTap: () {
               FocusScope.of(context).requestFocus(FocusNode());
             },
-            child: const LoaderOverlay(child: MyHomePage())));
+            child: LoaderOverlay(
+                child: MyHomePage(edit: edit, onRefresh: onRefresh))));
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  final String edit;
+  final Function(Map<String, dynamic>) onRefresh;
+
+  const MyHomePage({Key? key, required this.edit, required this.onRefresh})
+      : super(key: key);
 
   @override
   _MyCivilPageState createState() => _MyCivilPageState();
@@ -73,26 +82,26 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   };
 
   List<dynamic> condition_1 = <dynamic>[
-    {'key': 'tinhtrang_id', 'id': '0', "title": "Hộ nghèo", 'checked': '0'},
-    {'key': 'tinhtrang_id', 'id': '1', "title": "Hộ cận nghèo", 'checked': '0'},
+    {'key': 'tinhtrang_id', 'id': '1', "title": "Hộ nghèo", 'checked': '0'},
+    {'key': 'tinhtrang_id', 'id': '2', "title": "Hộ cận nghèo", 'checked': '0'},
   ];
 
   List<dynamic> condition_2 = <dynamic>[
     {
       'key': 'tinhtrang_congtrinh_id',
-      'id': '0',
+      'id': '1',
       "title": "Nhà \nkiên cố",
       'checked': '0'
     },
     {
       'key': 'tinhtrang_congtrinh_id',
-      'id': '1',
+      'id': '2',
       "title": "Nhà bán \nkiên cố",
       'checked': '0'
     },
     {
       'key': 'tinhtrang_congtrinh_id',
-      'id': '2',
+      'id': '3',
       "title": "Nhà \nđơn sơ",
       'checked': '0'
     },
@@ -206,14 +215,18 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       return item['checked'] == "1";
     });
     if (con1.isNotEmpty) {
-      request.fields['tinhtrang_id'] = con1.first['id'];
+      request.fields['tinhtrang_id'] = con1.first['id'] is int
+          ? con1.first['id'].toString()
+          : con1.first['id'];
     }
 
     var con2 = condition_2.where((item) {
       return item['checked'] == "1";
     });
     if (con2.isNotEmpty) {
-      request.fields['tinhtrang_congtrinh_id'] = con2.first['id'];
+      request.fields['tinhtrang_congtrinh_id'] = con2.first['id'] is int
+          ? con2.first['id'].toString()
+          : con2.first['id'];
     }
 
     request.fields['so_khau'] = people['peopleNo'];
@@ -233,11 +246,11 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
           item['singleMom'] == "1" ? 'true' : 'false';
       if (item['defected'] == "1") {
         var defectList = [
-          {'vision': '0'},
-          {'mobility': '1'},
-          {'hearing': '2'},
-          {'mental': '3'},
-          {'other': '4'},
+          {'vision': '1'},
+          {'mobility': '2'},
+          {'hearing': '3'},
+          {'mental': '4'},
+          {'other': '5'},
         ];
 
         for (var obj in defectList) {
@@ -266,10 +279,15 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
     if (responseObj['status'] == "OK") {
       _showToast("Cập nhật hoàn thành");
-      await Storing().updateCounter('homeIndex');
-      getCounter();
-      _resetAll();
-      _scrollToTop();
+      if (widget.edit != "-1") {
+        widget.onRefresh({"index": int.parse(widget.edit)});
+        Navigator.pop(context);
+      } else {
+        await Storing().updateCounter('homeIndex');
+        getCounter();
+        _resetAll();
+        _scrollToTop();
+      }
     } else {
       var error = responseObj['errors'][0];
       _showToast(error['message']);
@@ -310,6 +328,32 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
+  _editAll() async {
+    var val =
+        await Storing().getDataAt(int.parse(widget.edit) - 0, 'civil') ?? [];
+    var data = jsonDecode(val)['data'];
+
+    setState(() {
+      latLong = data['coordinate'];
+      people = data['people'];
+      condition_1 = data['condition1'];
+      condition_2 = data['condition2'];
+      detailList = data['detail'];
+      for (var detail in detailList) {
+        detail['owner'] = false;
+      }
+    });
+
+    for (var text in fieldView) {
+      TextEditingController textField = text['text'];
+      for (var key in people.keys) {
+        if (key == text['key']) {
+          textField.text = people[key];
+        }
+      }
+    }
+  }
+
   _resetAll() {
     setState(() {
       latLong = {
@@ -329,10 +373,10 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       };
 
       condition_1 = [
-        {'key': 'tinhtrang_id', 'id': 0, "title": "Hộ nghèo", 'checked': '0'},
+        {'key': 'tinhtrang_id', 'id': '1', "title": "Hộ nghèo", 'checked': '0'},
         {
           'key': 'tinhtrang_id',
-          'id': 1,
+          'id': '2',
           "title": "Hộ cận nghèo",
           'checked': '0'
         },
@@ -341,19 +385,19 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       condition_2 = [
         {
           'key': 'tinhtrang_congtrinh_id',
-          'id': '0',
+          'id': '1',
           "title": "Nhà \nkiên cố",
           'checked': '0'
         },
         {
           'key': 'tinhtrang_congtrinh_id',
-          'id': '1',
+          'id': '2',
           "title": "Nhà bán \nkiên cố",
           'checked': '0'
         },
         {
           'key': 'tinhtrang_congtrinh_id',
-          'id': '2',
+          'id': '3',
           "title": "Nhà \nđơn sơ",
           'checked': '0'
         },
@@ -381,8 +425,9 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       ];
     });
 
-    for (TextEditingController text in fieldView) {
-      text.clear();
+    for (var text in fieldView) {
+      TextEditingController textField = text['text'];
+      textField.clear();
     }
     FocusScope.of(context).requestFocus(FocusNode());
   }
@@ -390,29 +435,35 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   _goNext() {
     setState(() {
       position += 1;
-
-      var checkOwner = detailList.where((item) {
-        return item['houseHold'] == "1";
-      });
-
-      detailList.add(
-        {
-          'birthDay': '',
-          "order": "${position + 1}/${people['peopleNo']}",
-          'valid': false,
-          'owner': checkOwner.isNotEmpty,
-          'male': '0',
-          'female': '0',
-          'houseHold': '0',
-          'singleMom': '0',
-          'defected': '0',
-          'vision': '0',
-          'mobility': '0',
-          'hearing': '0',
-          'mental': '0',
-          'other': '0',
-        },
-      );
+      if (widget.edit != "-1") {
+        var checkOwner = detailList.where((item) {
+          return item['houseHold'] == "1";
+        });
+        detailList.add(
+          {
+            'birthDay': '',
+            "order": "${position + 1}/${people['peopleNo']}",
+            'valid': false,
+            'owner': checkOwner.isNotEmpty,
+            'male': '0',
+            'female': '0',
+            'houseHold': '0',
+            'singleMom': '0',
+            'defected': '0',
+            'vision': '0',
+            'mobility': '0',
+            'hearing': '0',
+            'mental': '0',
+            'other': '0',
+          },
+        );
+      } else {
+        if (detailList[position - 1]['houseHold'] == "1") {
+          for (var i = position; i <= detailList.length; i++) {
+            detailList[i]['owner'] = true;
+          }
+        }
+      }
     });
   }
 
@@ -595,10 +646,12 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             GestureDetector(
                 onTap: () {
                   if (_validCoor ||
-                      _validPeople ||
-                      _validGender ||
-                      _validDetail ||
-                      (position < int.parse(people['peopleNo']) - 1)) {
+                          _validPeople ||
+                          _validGender ||
+                          _validDetail ||
+                          widget.edit != "-1"
+                      ? false
+                      : (position < int.parse(people['peopleNo']) - 1)) {
                     _showToast(toast);
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
@@ -606,10 +659,12 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                 child: AbsorbPointer(
                     absorbing: //false,
                         _validCoor ||
-                            _validPeople ||
-                            _validGender ||
-                            _validDetail ||
-                            (position < int.parse(people['peopleNo']) - 1),
+                                _validPeople ||
+                                _validGender ||
+                                _validDetail ||
+                                widget.edit != "-1"
+                            ? false
+                            : (position < int.parse(people['peopleNo']) - 1),
                     child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -763,10 +818,20 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   void getCounter() async {
     Storing().initCounter();
-    int? counter = await Storing().getCounter('homeIndex');
-    setState(() {
-      unitNo = counter.toString();
-    });
+    if (widget.edit != "-1") {
+      var val =
+          await Storing().getDataAt(int.parse(widget.edit) - 0, 'civil') ?? [];
+      var data = jsonDecode(val);
+      setState(() {
+        unitNo = data['id'];
+      });
+      _editAll();
+    } else {
+      int? counter = await Storing().getCounter('homeIndex');
+      setState(() {
+        unitNo = counter.toString();
+      });
+    }
   }
 
   @override
@@ -913,18 +978,32 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                     FocusScope.of(context).requestFocus(FocusNode()),
                     if (validate())
                       {
-                        if (await hasNetwork())
+                        if (!await hasNetwork())
                           {_addingHouse(_mergeAll())}
                         else
                           {
-                            Storing().addData(
-                                {'id': unitNo, 'data': _mergeAll()}, 'civil'),
-                            await Storing().updateCounter('homeIndex'),
-                            getCounter(),
-                            _resetAll(),
-                            _scrollToTop(),
-                            _showToast(
-                                'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet')
+                            if (widget.edit != "-1")
+                              {
+                                Storing().updateDataAt(
+                                    int.parse(widget.edit),
+                                    'civil',
+                                    {'id': unitNo, 'data': _mergeAll()}),
+                                _showToast(
+                                    'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet'),
+                                Navigator.pop(context)
+                              }
+                            else
+                              {
+                                Storing().addData(
+                                    {'id': unitNo, 'data': _mergeAll()},
+                                    'civil'),
+                                await Storing().updateCounter('homeIndex'),
+                                getCounter(),
+                                _resetAll(),
+                                _scrollToTop(),
+                                _showToast(
+                                    'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet')
+                              }
                           }
                       },
                   },

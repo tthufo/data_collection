@@ -18,7 +18,10 @@ import 'package:path_provider/path_provider.dart';
 
 class SchoolView extends StatelessWidget {
   final String edit;
-  const SchoolView({Key? key, required this.edit}) : super(key: key);
+  final Function(Map<String, dynamic>) onRefresh;
+
+  const SchoolView({Key? key, required this.edit, required this.onRefresh})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,13 +44,17 @@ class SchoolView extends StatelessWidget {
             onTap: () {
               FocusScope.of(context).requestFocus(FocusNode());
             },
-            child: LoaderOverlay(child: MyHomePage(edit: edit))));
+            child: LoaderOverlay(
+                child: MyHomePage(edit: edit, onRefresh: onRefresh))));
   }
 }
 
 class MyHomePage extends StatefulWidget {
   final String edit;
-  const MyHomePage({Key? key, required this.edit}) : super(key: key);
+  final Function(Map<String, dynamic>) onRefresh;
+
+  const MyHomePage({Key? key, required this.edit, required this.onRefresh})
+      : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -150,13 +157,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     request.fields['ten_truong'] = grade["school"];
 
     var gradeList = [
-      {'lvl1': '0'},
-      {'lvl2': '1'},
-      {'lvl3': '2'},
-      {'lvl4': '3'},
-      {'lvl5': '4'},
-      {'lvl6': '5'},
-      {'lvl7': '6'},
+      {'lvl1': '1'},
+      {'lvl2': '2'},
+      {'lvl3': '3'},
+      {'lvl4': '4'},
+      {'lvl5': '5'},
+      {'lvl6': '6'},
+      {'lvl7': '7'},
     ];
     for (var obj in gradeList) {
       if (grade[obj.keys.first] == "1") {
@@ -166,9 +173,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
 
     var conList = [
-      {'con1': '0'},
-      {'con2': '1'},
-      {'con3': '2'},
+      {'con1': '1'},
+      {'con2': '2'},
+      {'con3': '3'},
     ];
     for (var obj in conList) {
       if (grade[obj.keys.first] == "1") {
@@ -208,10 +215,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     if (responseObj['status'] == "OK") {
       _showToast("Cập nhật hoàn thành");
-      await Storing().updateCounter('schoolIndex');
-      getCounter();
-      _resetAll();
-      _scrollToTop();
+      if (widget.edit != "-1") {
+        widget.onRefresh({"index": int.parse(widget.edit)});
+        Navigator.pop(context);
+      } else {
+        await Storing().updateCounter('schoolIndex');
+        getCounter();
+        _resetAll();
+        _scrollToTop();
+      }
     } else {
       var error = responseObj['errors'][0];
       _showToast(error['message']);
@@ -282,8 +294,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void getCounter() async {
     Storing().initCounter();
     if (widget.edit != "-1") {
+      var val =
+          await Storing().getDataAt(int.parse(widget.edit) - 0, 'school') ?? [];
+      var data = jsonDecode(val);
       setState(() {
-        unitNo = widget.edit;
+        unitNo = data['id'];
       });
       _editAll();
     } else {
@@ -404,7 +419,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   _editAll() async {
     var val =
-        await Storing().getDataAt(int.parse(widget.edit) - 1, 'school') ?? [];
+        await Storing().getDataAt(int.parse(widget.edit) - 0, 'school') ?? [];
     var data = jsonDecode(val)['data'];
 
     setState(() {
@@ -424,12 +439,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       }
       for (var key in schoolDetail.keys) {
         if (key == text['key']) {
-          textField.text = latLong[key];
+          textField.text = schoolDetail[key];
         }
       }
       for (var key in gradeObj.keys) {
         if (key == text['key']) {
-          textField.text = latLong[key];
+          textField.text = gradeObj[key];
         }
       }
     }
@@ -485,6 +500,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       TextEditingController textField = text['text'];
       textField.clear();
     }
+
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
@@ -1114,14 +1130,28 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           {_addingSchool(_mergeAll())}
                         else
                           {
-                            Storing().addData(
-                                {'id': unitNo, 'data': _mergeAll()}, 'school'),
-                            await Storing().updateCounter('schoolIndex'),
-                            getCounter(),
-                            _resetAll(),
-                            _scrollToTop(),
-                            _showToast(
-                                'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet')
+                            if (widget.edit != "-1")
+                              {
+                                Storing().updateDataAt(
+                                    int.parse(widget.edit),
+                                    'school',
+                                    {'id': unitNo, 'data': _mergeAll()}),
+                                _showToast(
+                                    'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet'),
+                                Navigator.pop(context)
+                              }
+                            else
+                              {
+                                Storing().addData(
+                                    {'id': unitNo, 'data': _mergeAll()},
+                                    'school'),
+                                await Storing().updateCounter('schoolIndex'),
+                                getCounter(),
+                                _resetAll(),
+                                _scrollToTop(),
+                                _showToast(
+                                    'Dữ liệu đã lưu nhưng Hoạt động chưa hoàn tất do không có mạng Internet - Đề nghị vào Danh sách để hoàn tất khi có mạng internet')
+                              }
                           }
                       }
                   },

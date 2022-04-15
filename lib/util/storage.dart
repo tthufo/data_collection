@@ -56,6 +56,13 @@ class Storing {
     return result[index];
   }
 
+  Future<void> updateDataAt(index, name, obj) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? result = prefs.getStringList(name) ?? [];
+    result[index] = jsonEncode(obj);
+    prefs.setStringList(name, result);
+  }
+
   void delDataAt(index, name) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? result = prefs.getStringList(name) ?? [];

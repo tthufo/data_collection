@@ -44,7 +44,7 @@ class _MyPeoplePageState extends State<PeopleView> {
               },
               onChange: (texting) {
                 if (texting.runtimeType != String) {
-                  listText.add(texting);
+                  listText.add({"text": texting, "key": "peopleNo"});
                 } else {
                   widget.onChange({'text': texting, 'type': 'peopleNo'});
                 }
@@ -74,7 +74,7 @@ class _MyPeoplePageState extends State<PeopleView> {
                       },
                       onChange: (texting) {
                         if (texting.runtimeType != String) {
-                          listText.add(texting);
+                          listText.add({"text": texting, "key": "maleNo"});
                         } else {
                           widget.onChange({'text': texting, 'type': 'maleNo'});
                         }
@@ -91,22 +91,12 @@ class _MyPeoplePageState extends State<PeopleView> {
                       },
                       onChange: (texting) {
                         if (texting.runtimeType != String) {
-                          listText.add(texting);
+                          listText.add({"text": texting, "key": "femaleNo"});
                         } else {
                           widget
                               .onChange({'text': texting, 'type': 'femaleNo'});
                         }
                       }),
-                  // Buttoning(
-                  //   title: "Nhận tọa độ",
-                  //   onClickAction: () => {
-                  //     for (TextEditingController text in listText) {text.clear()}
-                  //   },
-                  //   obj: const {
-                  //     'borderColor': Colors.greenAccent,
-                  //     'titleColor': Colors.black,
-                  //   },
-                  // ),
                 ],
               )),
         ),

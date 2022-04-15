@@ -6,6 +6,8 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import '../school/school.dart';
+import '../civlization/civil.dart';
+
 import '../util/storage.dart';
 
 class Listing extends StatelessWidget {
@@ -212,7 +214,21 @@ class _MyHomePageState extends State<Option>
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => SchoolView(edit: id)));
+                          builder: (context) => _selectedGender == "0"
+                              ? CivilView(
+                                  edit: pos.toString(),
+                                  onRefresh: (result) {
+                                    int indexing = result["index"];
+                                    _refreshData(indexing);
+                                  },
+                                )
+                              : SchoolView(
+                                  edit: pos.toString(),
+                                  onRefresh: (result) {
+                                    int indexing = result["index"];
+                                    _refreshData(indexing);
+                                  },
+                                )));
                 } else {
                   _refreshData(pos);
                 }

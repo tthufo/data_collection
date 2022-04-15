@@ -87,8 +87,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             Buttoning(
               title: "HỘ DÂN",
               onClickAction: () => {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const CivilView()))
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CivilView(
+                              edit: "-1",
+                              onRefresh: (result) {},
+                            )))
               },
               obj: {
                 'borderColor': Colors.blue,
@@ -118,7 +123,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SchoolView(edit: "-1")))
+                        builder: (context) =>
+                            SchoolView(edit: "-1", onRefresh: (result) {})))
               },
               obj: {
                 'borderColor': Colors.blue,
