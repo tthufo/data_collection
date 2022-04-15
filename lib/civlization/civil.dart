@@ -435,7 +435,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   _goNext() {
     setState(() {
       position += 1;
-      if (widget.edit != "-1") {
+      if (widget.edit == "-1") {
         var checkOwner = detailList.where((item) {
           return item['houseHold'] == "1";
         });
@@ -459,7 +459,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
         );
       } else {
         if (detailList[position - 1]['houseHold'] == "1") {
-          for (var i = position; i <= detailList.length; i++) {
+          for (var i = position; i < detailList.length; i++) {
             detailList[i]['owner'] = true;
           }
         }
