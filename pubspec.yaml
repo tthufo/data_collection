@@ -78,6 +78,8 @@ flutter:
    - images/img_home.png
    - images/img_bg_bg.png
    - images/img_bg_head.png
+   - images/ic_homer.png
+   - images/ic_schooler.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

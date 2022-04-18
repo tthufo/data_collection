@@ -461,6 +461,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
         if (detailList[position - 1]['houseHold'] == "1") {
           for (var i = position; i < detailList.length; i++) {
             detailList[i]['owner'] = true;
+            detailList[i]['houseHold'] = '0';
           }
         }
       }
@@ -496,6 +497,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                 onTap: () {
                   if (_validCoor) {
                     _showToast(toast);
+                    validate();
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
@@ -531,6 +533,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                 onTap: () {
                   if (_validCoor) {
                     _showToast(toast);
+                    validate();
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
@@ -567,6 +570,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                 onTap: () {
                   if (_validCoor || _validPeople || _validGender) {
                     _showToast(toast);
+                    validate();
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
@@ -625,6 +629,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                       _validGender ||
                       _validDetail) {
                     _showToast(toast);
+                    validate();
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
@@ -646,25 +651,27 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             GestureDetector(
                 onTap: () {
                   if (_validCoor ||
-                          _validPeople ||
-                          _validGender ||
-                          _validDetail ||
-                          widget.edit != "-1"
-                      ? false
-                      : (position < int.parse(people['peopleNo']) - 1)) {
+                      _validPeople ||
+                      _validGender ||
+                      _validDetail ||
+                      (widget.edit != "-1"
+                          ? false
+                          : (position < int.parse(people['peopleNo']) - 1))) {
                     _showToast(toast);
+                    validate();
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
                 child: AbsorbPointer(
                     absorbing: //false,
                         _validCoor ||
-                                _validPeople ||
-                                _validGender ||
-                                _validDetail ||
-                                widget.edit != "-1"
-                            ? false
-                            : (position < int.parse(people['peopleNo']) - 1),
+                            _validPeople ||
+                            _validGender ||
+                            _validDetail ||
+                            (widget.edit != "-1"
+                                ? false
+                                : (position <
+                                    int.parse(people['peopleNo']) - 1)),
                     child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -899,7 +906,10 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     if (detailList[position]['birthDay'] == "" ||
         (detailList[position]['male'] == "0" &&
-            detailList[position]['female'] == "0")) {
+            detailList[position]['female'] == "0") ||
+        (widget.edit != "-1"
+            ? false
+            : position < int.parse(people['peopleNo']) - 1)) {
       setState(() {
         validOther['checkDetail'] = true;
       });

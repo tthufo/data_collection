@@ -136,8 +136,11 @@ class _MyHomePageState extends State<Option>
           children: <Widget>[
             Expanded(
                 flex: 2,
-                child: Image.asset("images/img_logos.png",
-                    height: 50, width: 50, fit: BoxFit.cover)),
+                child: _selectedGender == "0"
+                    ? Image.asset("images/ic_homer.png",
+                        height: 50, width: 50, fit: BoxFit.cover)
+                    : Image.asset("images/ic_schooler.png",
+                        height: 50, width: 50, fit: BoxFit.cover)),
             const SizedBox(
               width: 10,
             ),
@@ -409,29 +412,33 @@ class _MyHomePageState extends State<Option>
     request.fields['ten_truong'] = grade["school"];
 
     var gradeList = [
-      {'lvl1': '0'},
-      {'lvl2': '1'},
-      {'lvl3': '2'},
-      {'lvl4': '3'},
-      {'lvl5': '4'},
-      {'lvl6': '5'},
-      {'lvl7': '6'},
+      {'lvl1': '1'},
+      {'lvl2': '2'},
+      {'lvl3': '3'},
+      {'lvl4': '4'},
+      {'lvl5': '5'},
+      {'lvl6': '6'},
+      {'lvl7': '7'},
     ];
     for (var obj in gradeList) {
       if (grade[obj.keys.first] == "1") {
-        request.fields['phanloai_id'] = obj.values.first;
+        request.fields['phanloai_id'] = obj.values.first is int
+            ? obj.values.first.toString()
+            : obj.values.first;
         break;
       }
     }
 
     var conList = [
-      {'con1': '0'},
-      {'con2': '1'},
-      {'con3': '2'},
+      {'con1': '1'},
+      {'con2': '2'},
+      {'con3': '3'},
     ];
     for (var obj in conList) {
       if (grade[obj.keys.first] == "1") {
-        request.fields['tinhtrang_id'] = obj.values.first;
+        request.fields['tinhtrang_id'] = obj.values.first is int
+            ? obj.values.first.toString()
+            : obj.values.first;
         break;
       }
     }

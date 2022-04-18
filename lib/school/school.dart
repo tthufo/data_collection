@@ -530,6 +530,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 onTap: () {
                   if (_validCoor) {
                     _showToast(toast);
+                    validate();
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
@@ -554,6 +555,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 onTap: () {
                   if (_validCoor || _validHeader) {
                     _showToast(toast);
+                    validate();
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
@@ -576,6 +578,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       _validDetail ||
                       _validNumber) {
                     _showToast(toast);
+                    validate();
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
                 },

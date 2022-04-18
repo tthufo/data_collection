@@ -11,25 +11,31 @@ class OptionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // appBar: AppBar(
-        //   automaticallyImplyLeading: false,
-        // ),
-        body: Stack(
-      children: <Widget>[
-        Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            // image: DecorationImage(
-            //   image: AssetImage("images/bg_img.png"),
-            //   fit: BoxFit.cover,
-            // ),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          flexibleSpace: const Image(
+            image: AssetImage('images/img_bg_head.png'),
+            height: double.infinity,
+            fit: BoxFit.cover,
           ),
+          backgroundColor: Colors.transparent,
         ),
-        const Center(
-          child: Center(child: MyHomePage()),
-        )
-      ],
-    ));
+        body: Stack(
+          children: <Widget>[
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                // image: DecorationImage(
+                //   image: AssetImage("images/bg_img.png"),
+                //   fit: BoxFit.cover,
+                // ),
+              ),
+            ),
+            const Center(
+              child: Center(child: MyHomePage()),
+            )
+          ],
+        ));
   }
 }
 
@@ -48,15 +54,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset("images/img_bg_head.png",
-                height: 80,
-                width: MediaQuery.of(context).size.width,
-                fit: BoxFit.cover),
-            Container(
-              child: const Text(""),
-              color: Colors.grey,
-              height: MediaQuery.of(context).size.height * 0.02,
-            ),
+            // Image.asset("images/img_bg_head.png",
+            //     height: 80,
+            //     width: MediaQuery.of(context).size.width,
+            //     fit: BoxFit.cover),
+            // Container(
+            //   child: const Text(""),
+            //   color: Colors.grey,
+            //   height: MediaQuery.of(context).size.height * 0.02,
+            // ),
             Image.asset("images/img_logos.png",
                 height: 120, width: 120, fit: BoxFit.cover),
             const SizedBox(height: 15.0),
@@ -104,18 +110,20 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 'fontSize': 17.0
               },
             ),
-            // const SizedBox(height: 25.0),
-            // Buttoning(
-            //   title: "NHÀ VĂN HÓA",
-            //   onClickAction: () => {},
-            //   obj: {
-            //     'borderColor': Colors.black,
-            //     'titleColor': Colors.black,
-            //     'width': MediaQuery.of(context).size.width * 0.6,
-            //     'height': 50.0,
-            //     'fontSize': 20.0
-            //   },
-            // ),
+            const SizedBox(height: 25.0),
+            Buttoning(
+              title: "NHÀ VĂN HÓA",
+              onClickAction: () =>
+                  {_showToast('Chức năng hiện trong quá trình nâng cấp')},
+              obj: {
+                'borderColor': Colors.blue,
+                'titleColor': Colors.black,
+                'borderWidth': 2.0,
+                'width': MediaQuery.of(context).size.width * 0.7,
+                'height': 50.0,
+                'fontSize': 17.0
+              },
+            ),
             const SizedBox(height: 25.0),
             Buttoning(
               title: "TRƯỜNG HỌC",
@@ -130,6 +138,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 'borderColor': Colors.blue,
                 'borderWidth': 2.0,
                 'titleColor': Colors.black,
+                'width': MediaQuery.of(context).size.width * 0.7,
+                'height': 50.0,
+                'fontSize': 17.0
+              },
+            ),
+            const SizedBox(height: 25.0),
+            Buttoning(
+              title: "ỦY BAN NHÂN DÂN",
+              onClickAction: () =>
+                  {_showToast('Chức năng hiện trong quá trình nâng cấp')},
+              obj: {
+                'borderColor': Colors.blue,
+                'titleColor': Colors.black,
+                'borderWidth': 2.0,
+                'width': MediaQuery.of(context).size.width * 0.7,
+                'height': 50.0,
+                'fontSize': 17.0
+              },
+            ),
+            const SizedBox(height: 25.0),
+            Buttoning(
+              title: "BỆNH VIỆN",
+              onClickAction: () =>
+                  {_showToast('Chức năng hiện trong quá trình nâng cấp')},
+              obj: {
+                'borderColor': Colors.blue,
+                'titleColor': Colors.black,
+                'borderWidth': 2.0,
                 'width': MediaQuery.of(context).size.width * 0.7,
                 'height': 50.0,
                 'fontSize': 17.0
@@ -154,21 +190,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 'fontSize': 17.0
               },
             ),
-            // const SizedBox(height: 25.0),
-            // Buttoning(
-            //   title: "BỆNH VIỆN",
-            //   onClickAction: () => {},
-            //   obj: {
-            //     'borderColor': Colors.black,
-            //     'titleColor': Colors.black,
-            //     'width': MediaQuery.of(context).size.width * 0.7,
-            //     'height': 50.0,
-            //     'fontSize': 17.0
-            //   },
-            // ),
             const SizedBox(height: 25.0),
           ],
         ));
+  }
+
+  _showToast(mess) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(mess)))
+        .closed
+        .then((value) => ScaffoldMessenger.of(context).clearSnackBars());
   }
 
   @override
