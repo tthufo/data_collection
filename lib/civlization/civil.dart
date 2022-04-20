@@ -154,13 +154,14 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   bool get _validPeople {
-    var con1 = condition_1.where((item) {
-      return item['checked'] == "1";
-    });
-    var con2 = condition_2.where((item) {
-      return item['checked'] == "1";
-    });
-    return con1.isEmpty || con2.isEmpty || _validMem;
+    // var con1 = condition_1.where((item) {
+    //   return item['checked'] == "1";
+    // });
+    // var con2 = condition_2.where((item) {
+    //   return item['checked'] == "1";
+    // });
+    // return con1.isEmpty || con2.isEmpty ||
+    return _validMem;
   }
 
   bool get _validGender {
