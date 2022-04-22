@@ -91,26 +91,43 @@ class _MyHomePageState extends State<FieldView> {
               onChanged: (text) {
                 widget.onChange(text);
               },
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Montserrat',
-                fontSize: 17.0,
+                fontSize: widget.obj['fontSize'] ?? 17.0,
+                fontWeight: widget.obj['fontWeight'] ?? FontWeight.normal,
                 color: Colors.black,
               ),
               decoration: InputDecoration(
                 counterText: "",
-                contentPadding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+                contentPadding: widget.obj['underLine'] != null
+                    ? const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0)
+                    : const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
                 isDense: true,
                 hintText: widget.obj['hintText'] ?? "",
                 hintStyle: const TextStyle(color: Colors.black),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent, width: 1.5),
-                ),
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent, width: 1.5),
-                ),
+                border: widget.obj['underLine'] != null
+                    ? const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      )
+                    : OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                focusedBorder: widget.obj['underLine'] != null
+                    ? const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      )
+                    : const OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.blueAccent, width: 1.5),
+                      ),
+                enabledBorder: widget.obj['underLine'] != null
+                    ? const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      )
+                    : const OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.blueAccent, width: 1.5),
+                      ),
               ),
             )),
         widget.obj['end'] != null

@@ -4,6 +4,8 @@ import './util/storage.dart';
 import './civlization/civil.dart';
 import './school/school.dart';
 import './tabs/list.dart';
+import './login.dart';
+import './user/infor.dart';
 
 class OptionView extends StatelessWidget {
   const OptionView({Key? key}) : super(key: key);
@@ -19,6 +21,40 @@ class OptionView extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           backgroundColor: Colors.transparent,
+          actions: [
+            DropdownButton<String>(
+              underline: const SizedBox(),
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+              items: <String>[
+                'Thông tin tài khoản',
+                'Đổi mật khẩu',
+                'Đăng xuất'
+              ].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (opt) {
+                if (opt == "Thông tin tài khoản") {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const InforView()));
+                } else if (opt == "Đổi mật khẩu") {
+                } else {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginView()));
+                }
+              },
+            ),
+            const SizedBox(width: 10)
+          ],
         ),
         body: Stack(
           children: <Widget>[
