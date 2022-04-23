@@ -6,6 +6,14 @@ import './school/school.dart';
 import './tabs/list.dart';
 import './login.dart';
 import './user/infor.dart';
+import './user/pass.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:loader_overlay/loader_overlay.dart';
+import '../component/buttoning.dart';
+import '../util/information.dart';
+import '../util/storage.dart';
 
 class OptionView extends StatelessWidget {
   const OptionView({Key? key}) : super(key: key);
@@ -45,33 +53,74 @@ class OptionView extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => const InforView()));
                 } else if (opt == "Đổi mật khẩu") {
-                } else {
-                  Navigator.pushReplacement(
+                  Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const LoginView()));
+                          builder: (context) => const PassView()));
+                } else {
+                  didLogOut(context);
                 }
               },
             ),
             const SizedBox(width: 10)
           ],
         ),
-        body: Stack(
+        body: LoaderOverlay(
+            child: Stack(
           children: <Widget>[
             Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                // image: DecorationImage(
-                //   image: AssetImage("images/bg_img.png"),
-                //   fit: BoxFit.cover,
-                // ),
               ),
             ),
             const Center(
               child: Center(child: MyHomePage()),
             )
           ],
-        ));
+        )));
+  }
+
+  Future<dynamic> didLogOut(BuildContext context) async {
+    context.loaderOverlay.show();
+
+    var token = await Storing().getString('token');
+    var postUri = Uri.parse("${Info.url}api/auth/logout");
+    var request = http.MultipartRequest(
+      "GET",
+      postUri,
+    );
+
+    request.headers.addAll({
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer $token',
+    });
+
+    context.loaderOverlay.hide();
+
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+    var responseObj = jsonDecode(responseString);
+
+    if (response.statusCode != 200) {
+      _showToast('Server xảy ra lỗi, mời bạn thử lại sau', context);
+      return;
+    }
+    if (responseObj['status'] == "OK") {
+      Storing().logOut();
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const LoginView()));
+    } else {
+      var error = responseObj['errors'][0];
+      _showToast(error['message'], context);
+    }
+  }
+
+  _showToast(mess, context) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mess),
+    ));
   }
 }
 

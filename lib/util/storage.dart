@@ -85,4 +85,11 @@ class Storing {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(name);
   }
+
+  void logOut() {
+    delString('logged');
+    delString('token');
+    delString('name');
+    delString('password');
+  }
 }

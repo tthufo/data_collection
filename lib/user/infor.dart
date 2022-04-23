@@ -1,5 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'package:loader_overlay/loader_overlay.dart';
 import '../component/buttoning.dart';
+import '../util/information.dart';
+import '../util/storage.dart';
 import './edit.dart';
 
 class InforView extends StatefulWidget {
@@ -10,9 +17,13 @@ class InforView extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<InforView> {
+  var userInfor = {};
+
   @override
   initState() {
     super.initState();
+    // context.loaderOverlay.show();
+    didRequestInfo();
   }
 
   @override
@@ -23,6 +34,57 @@ class _MyHomePageState extends State<InforView> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<dynamic> didRequestInfo() async {
+    var token = await Storing().getString('token');
+    var postUri = Uri.parse("${Info.url}api/auth");
+    var request = http.MultipartRequest(
+      "GET",
+      postUri,
+    );
+
+    request.headers.addAll({
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer $token',
+    });
+
+    context.loaderOverlay.hide();
+
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+    var responseObj = jsonDecode(responseString);
+
+    if (response.statusCode != 200) {
+      _showToast('Server xảy ra lỗi, mời bạn thử lại sau');
+      return;
+    }
+    if (responseObj['status'] == "OK") {
+      print(responseObj);
+      setState(() {
+        userInfor = responseObj['data'];
+      });
+    } else {
+      var error = responseObj['errors'][0];
+      _showToast(error['message']);
+    }
+  }
+
+  _showToast(mess) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mess),
+    ));
+  }
+
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
   }
 
   Widget body() {
@@ -62,34 +124,33 @@ class _MyHomePageState extends State<InforView> {
             fit: BoxFit.cover,
           ),
           const SizedBox(height: 50),
-          Container(
-              child: Column(children: [
-            Text("Tài chột",
-                style: TextStyle(
+          Column(children: [
+            Text(userInfor['user_name'] ?? '-',
+                style: const TextStyle(
                     fontSize: 28,
                     color: Colors.black,
                     fontWeight: FontWeight.bold)),
-            Text("Quản trị viên",
+            const Text("Quản trị viên",
                 style: TextStyle(
                     fontSize: 20,
                     color: Colors.grey,
                     fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Container(
-                margin: EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
                 width: MediaQuery.of(context).size.width,
-                child: Text(
+                child: const Text(
                   "THÔNG TIN CÁ NHÂN",
                   style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey,
                       fontWeight: FontWeight.bold),
                 )),
-            Divider(
+            const Divider(
               height: 2,
               color: Colors.grey,
             ),
-          ])),
+          ]),
         ],
       ),
       Positioned(
@@ -125,12 +186,12 @@ class _MyHomePageState extends State<InforView> {
 
   Widget mid() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      element({'title': 'Họ và tên', 'detail': 'Phạm Tài chột'}),
-      element({'title': 'Họ và tên', 'detail': 'Phạm Tài chột'}),
-      element({'title': 'Họ và tên', 'detail': 'Phạm Tài chột'}),
+      element({'title': 'Họ và tên', 'detail': userInfor['user_name'] ?? '-'}),
+      element({'title': 'Địa chỉ', 'detail': userInfor['unit'] ?? '-'}),
+      element({'title': 'Email', 'detail': userInfor['email'] ?? '-'}),
       element({
-        'title': 'Họ và tên',
-        'detail': 'Phạm Tài chộ s  sf asf sf asdf asf asf asf asf asf sft'
+        'title': 'Số điện thoại',
+        'detail': userInfor['phone_number'] ?? '-'
       }),
     ]);
   }
@@ -173,7 +234,8 @@ class _MyHomePageState extends State<InforView> {
           ),
           backgroundColor: Colors.transparent,
         ),
-        body: Stack(
+        body: LoaderOverlay(
+            child: Stack(
           children: <Widget>[
             Container(
               decoration: const BoxDecoration(
@@ -194,6 +256,6 @@ class _MyHomePageState extends State<InforView> {
               ),
             ),
           ],
-        ));
+        )));
   }
 }

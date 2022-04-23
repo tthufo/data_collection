@@ -9,6 +9,7 @@ import '../school/school.dart';
 import '../civlization/civil.dart';
 
 import '../util/storage.dart';
+import '../util/information.dart';
 
 class Listing extends StatelessWidget {
   final String title;
@@ -288,7 +289,7 @@ class _MyHomePageState extends State<Option>
 
   _addingHouse(data, pos) async {
     var token = await Storing().getString('token');
-    var postUri = Uri.parse("http://gisgo.vn:8016/api/household");
+    var postUri = Uri.parse("${Info.url}api/household");
     var request = http.MultipartRequest(
       "POST",
       postUri,
@@ -386,7 +387,7 @@ class _MyHomePageState extends State<Option>
 
   _addingSchool(data, pos) async {
     var token = await Storing().getString('token');
-    var postUri = Uri.parse("http://gisgo.vn:8016/api/school");
+    var postUri = Uri.parse("${Info.url}api/school");
     var request = http.MultipartRequest(
       "POST",
       postUri,

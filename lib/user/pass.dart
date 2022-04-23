@@ -3,23 +3,23 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import '../component/buttoning.dart';
 import '../component/textfield.dart';
 import 'package:flutter/services.dart';
 
 import '../util/storage.dart';
+import '../util/information.dart';
 
-class EditView extends StatelessWidget {
-  const EditView({Key? key}) : super(key: key);
+class PassView extends StatelessWidget {
+  const PassView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          title: const Text("Thay đổi thông tin"),
+          title: const Text("Đổi mật khẩu"),
           automaticallyImplyLeading: true,
           flexibleSpace: const Image(
             image: AssetImage('images/img_bg_head.png'),
@@ -41,7 +41,7 @@ class Option extends StatefulWidget {
 
 class _MyHomePageState extends State<Option>
     with AutomaticKeepAliveClientMixin {
-  List<dynamic> rowData = <dynamic>[];
+  var pass = {};
 
   @override
   void initState() {
@@ -66,80 +66,13 @@ class _MyHomePageState extends State<Option>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    top(),
-                    Container(
-                      child: null,
-                      height: 3,
-                      color: Colors.grey,
-                    ),
-                    Container(
-                        margin: const EdgeInsets.all(10),
-                        child: const Text("THÔNG TIN CÁ NHÂN",
-                            style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold))),
+                    const SizedBox(height: 50),
                     mid(),
                   ],
                 )))),
         Expanded(flex: 2, child: footer()),
       ],
     );
-  }
-
-  Widget top() {
-    return Container(
-        margin: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Ảnh đại diện",
-                style: TextStyle(
-                    fontSize: 23,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold)),
-            Row(children: [
-              Stack(
-                children: const [
-                  Image(
-                    image: AssetImage('images/img_Ava.png'),
-                    height: 110,
-                    width: 110,
-                    fit: BoxFit.cover,
-                  ),
-                  Positioned(
-                    left: 70,
-                    top: 70,
-                    child: Image(
-                      image: AssetImage('images/img_cam.png'),
-                      height: 30,
-                      width: 30,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 10),
-              Container(
-                  constraints: BoxConstraints(
-                      minWidth: 10,
-                      maxWidth: MediaQuery.of(context).size.width - 210),
-                  child: const Text("sá",
-                      maxLines: 2,
-                      style: TextStyle(
-                          fontSize: 21,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold))),
-              const SizedBox(width: 5),
-              const Image(
-                image: AssetImage('images/img_edit.png'),
-                height: 30,
-                width: 30,
-                fit: BoxFit.cover,
-              )
-            ])
-          ],
-        ));
   }
 
   Future<bool> hasNetwork() async {
@@ -164,7 +97,8 @@ class _MyHomePageState extends State<Option>
                       fontWeight: FontWeight.bold))),
           FieldView(
               obj: {
-                "limit": obj['title'] == "Họ và tên" ? 25 : 100,
+                "limit": 100,
+                "obscureText": '1',
                 "format": [FilteringTextInputFormatter.singleLineFormatter],
                 "textAlign": TextAlign.left,
                 "text": obj['detail'],
@@ -176,17 +110,31 @@ class _MyHomePageState extends State<Option>
               },
               onChange: (texting) {
                 if (texting.runtimeType != String) {
-                } else {}
+                } else {
+                  if (obj['title'] == "Mật khẩu cũ") {
+                    setState(() {
+                      pass['pass'] = texting;
+                    });
+                  }
+                  if (obj['title'] == "Mật khẩu mới") {
+                    setState(() {
+                      pass['newPass'] = texting;
+                    });
+                  } else {
+                    setState(() {
+                      pass['reNewPass'] = texting;
+                    });
+                  }
+                }
               })
         ]));
   }
 
   Widget mid() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      element({'title': 'Họ và tên', 'detail': ''}),
-      element({'title': 'Địa chỉ', 'detail': ''}),
-      element({'title': 'Email', 'detail': ''}),
-      element({'title': 'Số điện thoại', 'detail': ''}),
+      element({'title': 'Mật khẩu cũ', 'detail': ''}),
+      element({'title': 'Mật khẩu mới', 'detail': ''}),
+      element({'title': 'Nhập lại mật khẩu mới', 'detail': ''}),
     ]);
   }
 
@@ -198,9 +146,11 @@ class _MyHomePageState extends State<Option>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Buttoning(
-              title: "Lưu thông tin",
+              title: "Đổi mật khẩu",
               onClickAction: () => {
                 FocusScope.of(context).requestFocus(FocusNode()),
+                context.loaderOverlay.show(),
+                _changePass(),
               },
               obj: {
                 'bgColor': const Color.fromRGBO(39, 77, 158, 1),
@@ -228,27 +178,23 @@ class _MyHomePageState extends State<Option>
   @override
   bool get wantKeepAlive => true;
 
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
-
-  _addingHouse(data, pos) async {
+  _changePass() async {
     var token = await Storing().getString('token');
-    var postUri = Uri.parse("http://gisgo.vn:8016/api/household");
-    var request = http.MultipartRequest(
-      "POST",
-      postUri,
-    );
+    var postUri = Uri.parse("${Info.url}api/auth/password");
 
-    // request.files.add(http.MultipartFile.fromBytes(
-    //     'images', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
-    //     contentType: MediaType('image', ext)));
-
-    var response = await request.send();
-    var responseData = await response.stream.toBytes();
-    var responseString = String.fromCharCodes(responseData);
-    var responseObj = jsonDecode(responseString);
+    final body = {
+      'OldPasswd': pass['pass'],
+      'NewPasswd': pass['newPass'],
+      'ConfirmNewPasswd': pass['reNewPass'],
+    };
+    final jsonString = json.encode(body);
+    final headers = {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    final response =
+        await http.post(postUri, headers: headers, body: jsonString);
+    var responseObj = jsonDecode(response.body);
 
     context.loaderOverlay.hide();
     if (response.statusCode != 200) {
@@ -256,7 +202,8 @@ class _MyHomePageState extends State<Option>
       return;
     }
     if (responseObj['status'] == "OK") {
-      _showToast("Cập nhật hoàn thành");
+      _showToast("Cập nhật thành công");
+      Navigator.pop(context);
     } else {
       var error = responseObj['errors'][0];
       _showToast(error['message']);

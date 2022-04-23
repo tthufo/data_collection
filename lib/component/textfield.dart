@@ -16,6 +16,7 @@ class FieldView extends StatefulWidget {
 class _MyHomePageState extends State<FieldView> {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focus = FocusNode();
+  bool _isObscure = true;
 
   @override
   initState() {
@@ -26,6 +27,10 @@ class _MyHomePageState extends State<FieldView> {
   }
 
   void _onFocusChange() {
+    if (widget.obj['format'] != null) {
+      return;
+    }
+
     if (_focus.hasFocus.toString() == "false") {
       String formated = _textController.text == ""
           ? '0'
@@ -41,9 +46,6 @@ class _MyHomePageState extends State<FieldView> {
   @override
   void didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // if (oldWidget.obj["text"] != widget.obj["text"]) {
-    //   // _textController.text = widget.obj["text"];
-    // }
   }
 
   @override
@@ -81,9 +83,11 @@ class _MyHomePageState extends State<FieldView> {
             margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
             child: TextField(
               focusNode: _focus,
+              textAlignVertical: TextAlignVertical.center,
               textAlign: widget.obj['textAlign'] ?? TextAlign.center,
               controller: _textController,
-              obscureText: false,
+              obscureText:
+                  widget.obj['obscureText'] != null ? _isObscure : false,
               maxLength: widget.obj['limit'] ?? 4,
               keyboardType: widget.obj['type'] ?? TextInputType.text,
               inputFormatters: widget.obj['format'] ??
@@ -98,6 +102,18 @@ class _MyHomePageState extends State<FieldView> {
                 color: Colors.black,
               ),
               decoration: InputDecoration(
+                suffixIcon: widget.obj['obscureText'] != null
+                    ? IconButton(
+                        icon: Icon(
+                          _isObscure ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isObscure = !_isObscure;
+                          });
+                        },
+                      )
+                    : null,
                 counterText: "",
                 contentPadding: widget.obj['underLine'] != null
                     ? const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0)

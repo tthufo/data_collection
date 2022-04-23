@@ -15,6 +15,7 @@ import './people.dart';
 import '../component/camera.dart';
 import './civil_detail.dart';
 import '../util/storage.dart';
+import '../util/information.dart';
 import '../component/checker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -187,7 +188,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   _addingHouse(data) async {
     context.loaderOverlay.show();
     var token = await Storing().getString('token');
-    var postUri = Uri.parse("http://gisgo.vn:8016/api/household");
+    var postUri = Uri.parse('${Info.url}api/houseHold');
     var request = http.MultipartRequest(
       "POST",
       postUri,

@@ -13,6 +13,7 @@ import '../component/coordinate.dart';
 import '../component/camera.dart';
 import '../component/textfield.dart';
 import '../util/storage.dart';
+import '../util/information.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -131,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   _addingSchool(data) async {
     context.loaderOverlay.show();
     var token = await Storing().getString('token');
-    var postUri = Uri.parse("http://gisgo.vn:8016/api/school");
+    var postUri = Uri.parse('${Info.url}/api/school');
     var request = http.MultipartRequest(
       "POST",
       postUri,

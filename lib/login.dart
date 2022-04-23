@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:loader_overlay/loader_overlay.dart';
 import './util/storage.dart';
+import './util/information.dart';
 import 'dart:io';
 import 'option.dart';
 
@@ -21,7 +22,6 @@ class LoginView extends StatelessWidget {
               children: <Widget>[
                 Container(
                   decoration: const BoxDecoration(
-                    // color: Colors.pink,
                     image: DecorationImage(
                       image: AssetImage("images/img_bg_bg.png"),
                       fit: BoxFit.cover,
@@ -58,8 +58,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Future<dynamic> didRequestLogin(message) async {
     var url = message.runtimeType == String
-        ? "http://gisgo.vn:8016/api/auth/login?username=${name}&password=${password}"
-        : "http://gisgo.vn:8016/api/auth/login?username=${message['name']}&password=${message['password']}";
+        ? "${Info.url}api/auth/login?username=$name&password=$password"
+        : "${Info.url}api/auth/login?username=${message['name']}&password=${message['password']}";
     http.Response response = await http.get(
       Uri.parse(url),
       headers: {"Accept": "application/json"},
