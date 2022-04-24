@@ -203,7 +203,6 @@ class _MyHomePageState extends State<CameraView> {
     return Column(children: [
       const Divider(
         color: Colors.grey,
-        // height: 1,
       ),
       Container(
         margin: const EdgeInsets.all(10),

@@ -248,12 +248,22 @@ class _MyHomePageState extends State<InforView> {
             Positioned(
               left: (MediaQuery.of(context).size.width / 2) - 75,
               top: 50.0,
-              child: const Image(
-                image: AssetImage('images/img_Ava.png'),
+              child: ClipOval(
+                  child: FadeInImage(
+                image: NetworkImage(userInfor['avatar_path'] ?? ''),
+                placeholder: const AssetImage('images/img_Ava.png'),
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return const Image(
+                    image: AssetImage('images/img_Ava.png'),
+                    height: 150,
+                    width: 150,
+                    fit: BoxFit.cover,
+                  );
+                },
+                fit: BoxFit.cover,
                 height: 150,
                 width: 150,
-                fit: BoxFit.cover,
-              ),
+              )),
             ),
           ],
         )));

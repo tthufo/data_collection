@@ -58,7 +58,7 @@ class OptionView extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => const PassView()));
                 } else {
-                  didLogOut(context);
+                  showAlertDialog(context);
                 }
               },
             ),
@@ -78,6 +78,37 @@ class OptionView extends StatelessWidget {
             )
           ],
         )));
+  }
+
+  showAlertDialog(BuildContext context) {
+    Widget cancelButton = TextButton(
+      child: const Text("Bỏ qua"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = TextButton(
+      child: const Text("Đăng xuất"),
+      onPressed: () {
+        didLogOut(context);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Thông báo"),
+      content: const Text("Bạn có muốn đăng xuất khỏi tài khoản?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   Future<dynamic> didLogOut(BuildContext context) async {
