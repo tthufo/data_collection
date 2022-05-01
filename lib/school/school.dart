@@ -129,6 +129,54 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     'checkPicture': false,
   };
 
+  var pupilRelate = {
+    'total': 'pupil',
+    'pupilMale': {
+      'index_1': "3",
+      "index_2": "4",
+      'key_1': 'pupilMale',
+      "key_2": 'pupilFemale'
+    },
+    'pupilFemale': {
+      'index_1': "4",
+      "index_2": "3",
+      'key_1': 'pupilFemale',
+      "key_2": 'pupilMale'
+    }
+  };
+
+  var teacherRelate = {
+    'total': 'teacher',
+    'teacherMale': {
+      'index_1': "6",
+      "index_2": "7",
+      'key_1': 'teacherMale',
+      "key_2": 'teacherFemale'
+    },
+    'teacherFemale': {
+      'index_1': "7",
+      "index_2": "6",
+      'key_1': 'teacherFemale',
+      "key_2": 'teacherMale'
+    }
+  };
+
+  var peopleEvacRelate = {
+    'total': 'peopleEvac',
+    'peopleEvacMale': {
+      'index_1': "9",
+      "index_2": "10",
+      'key_1': 'peopleEvacMale',
+      "key_2": 'peopleEvacFemale'
+    },
+    'peopleEvacFemale': {
+      'index_1': "10",
+      "index_2": "9",
+      'key_1': 'peopleEvacFemale',
+      "key_2": 'peopleEvacMale'
+    }
+  };
+
   _addingSchool(data) async {
     context.loaderOverlay.show();
     var token = await Storing().getString('token');
@@ -201,6 +249,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     request.files.add(http.MultipartFile.fromBytes(
         'images', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
         contentType: MediaType('image', ext)));
+
+    print(request.fields);
 
     var response = await request.send();
     var responseData = await response.stream.toBytes();
@@ -782,6 +832,45 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         ));
   }
 
+  _resetRelation(typing, keys) {
+    Map<String, Object>? data = keys[typing];
+    String index_1 = data!['index_1'] as String;
+    String index_2 = data['index_2'] as String;
+    String key_1 = data['key_1'] as String;
+    String key_2 = data['key_2'] as String;
+    setState(() {
+      schoolDetail[key_1] = "";
+      schoolDetail[key_2] = "";
+    });
+
+    (listText[int.parse(index_1)]['text'] as TextEditingController).text = "";
+    (listText[int.parse(index_2)]['text'] as TextEditingController).text = "";
+  }
+
+  _relation(typing, value, keys) {
+    Map<String, Object>? data = keys[typing];
+    String index_1 = data!['index_1'] as String;
+    String index_2 = data['index_2'] as String;
+    String key_1 = data['key_1'] as String;
+    String key_2 = data['key_2'] as String;
+    String total = keys['total'] as String;
+    if (int.parse(value) > int.parse(schoolDetail[total])) {
+      (listText[int.parse(index_1)]['text'] as TextEditingController).text =
+          schoolDetail[total];
+      (listText[int.parse(index_2)]['text'] as TextEditingController).text =
+          "0";
+      setState(() {
+        schoolDetail[key_1] = schoolDetail[total];
+        schoolDetail[key_2] = '0';
+      });
+    } else {
+      (listText[int.parse(index_2)]['text'] as TextEditingController).text =
+          (int.parse(schoolDetail[total]) - int.parse(value)).toString();
+      schoolDetail[key_2] =
+          (int.parse(schoolDetail[total]) - int.parse(value)).toString();
+    }
+  }
+
   Widget detail() {
     return Column(children: [
       Row(children: [
@@ -819,6 +908,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               if (texting.runtimeType != String) {
                 listText.add({"text": texting, "key": "pupil"});
               } else {
+                _resetRelation('pupilMale', pupilRelate);
                 setState(() {
                   schoolDetail['pupil'] = texting;
                   schoolDetail['valid'] = false;
@@ -827,55 +917,72 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               }
             })
       ]),
-      Container(
-          decoration: BoxDecoration(
-              border: Border.all(
-                  width: 2,
-                  color: schoolDetailValid['validPupil'] == false
-                      ? Colors.transparent
-                      : Colors.redAccent)),
-          margin: const EdgeInsets.fromLTRB(8, 0, 6, 0),
-          child: Row(children: [
-            FieldView(
-                obj: {
-                  "width": 60.0,
-                  "pre": "Trong đó:",
-                  "start": "Nam",
-                  "end": "người",
-                  "text": schoolDetail['pupilMale'],
-                  "type": TextInputType.number,
-                },
-                onChange: (texting) {
-                  if (texting.runtimeType != String) {
-                    listText.add({"text": texting, "key": "pupilMale"});
-                  } else {
-                    setState(() {
-                      schoolDetail['pupilMale'] = texting;
-                      schoolDetail['valid'] = false;
-                      schoolDetailValid['validPupil'] = false;
-                    });
-                  }
-                }),
-            FieldView(
-                obj: {
-                  "width": 60.0,
-                  "start": "Nữ",
-                  "end": "người",
-                  "text": schoolDetail['pupilFemale'],
-                  "type": TextInputType.number,
-                },
-                onChange: (texting) {
-                  if (texting.runtimeType != String) {
-                    listText.add({"text": texting, "key": "pupilFemale"});
-                  } else {
-                    setState(() {
-                      schoolDetail['pupilFemale'] = texting;
-                      schoolDetail['valid'] = false;
-                      schoolDetailValid['validPupil'] = false;
-                    });
-                  }
-                })
-          ])),
+      GestureDetector(
+          onTap: () {
+            if (schoolDetail['pupil'] == "" || schoolDetail['pupil'] == "0") {
+              _showToast('Tổng số học sinh đang trống');
+            }
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: AbsorbPointer(
+              absorbing:
+                  schoolDetail['pupil'] == "" || schoolDetail['pupil'] == "0",
+              child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 2,
+                          color: schoolDetailValid['validPupil'] == false
+                              ? Colors.transparent
+                              : Colors.redAccent)),
+                  margin: const EdgeInsets.fromLTRB(8, 0, 6, 0),
+                  child: Row(children: [
+                    FieldView(
+                        obj: {
+                          "width": 60.0,
+                          "pre": "Trong đó:",
+                          "start": "Nam",
+                          "end": "người",
+                          "text": schoolDetail['pupilMale'],
+                          "type": TextInputType.number,
+                        },
+                        onChange: (texting) {
+                          if (texting.runtimeType != String) {
+                            listText.add({"text": texting, "key": "pupilMale"});
+                          } else {
+                            setState(() {
+                              schoolDetail['pupilMale'] = texting;
+                              schoolDetail['valid'] = false;
+                              schoolDetailValid['validPupil'] = false;
+                            });
+                          }
+                        },
+                        onUnfocus: (texting) {
+                          _relation('pupilMale', texting, pupilRelate);
+                        }),
+                    FieldView(
+                        obj: {
+                          "width": 60.0,
+                          "start": "Nữ",
+                          "end": "người",
+                          "text": schoolDetail['pupilFemale'],
+                          "type": TextInputType.number,
+                        },
+                        onChange: (texting) {
+                          if (texting.runtimeType != String) {
+                            listText
+                                .add({"text": texting, "key": "pupilFemale"});
+                          } else {
+                            setState(() {
+                              schoolDetail['pupilFemale'] = texting;
+                              schoolDetail['valid'] = false;
+                              schoolDetailValid['validPupil'] = false;
+                            });
+                          }
+                        },
+                        onUnfocus: (texting) {
+                          _relation('pupilFemale', texting, pupilRelate);
+                        })
+                  ])))),
       Row(children: [
         FieldView(
             obj: {
@@ -890,6 +997,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               if (texting.runtimeType != String) {
                 listText.add({"text": texting, "key": "teacher"});
               } else {
+                _resetRelation('teacherMale', teacherRelate);
                 setState(() {
                   schoolDetail['teacher'] = texting;
                   schoolDetail['valid'] = false;
@@ -898,55 +1006,74 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               }
             })
       ]),
-      Container(
-          decoration: BoxDecoration(
-              border: Border.all(
-                  width: 2,
-                  color: schoolDetailValid['validTeacher'] == false
-                      ? Colors.transparent
-                      : Colors.redAccent)),
-          margin: const EdgeInsets.fromLTRB(8, 0, 6, 0),
-          child: Row(children: [
-            FieldView(
-                obj: {
-                  "width": 60.0,
-                  "pre": "Trong đó:",
-                  "start": "Nam",
-                  "end": "người",
-                  "text": schoolDetail['teacherMale'],
-                  "type": TextInputType.number,
-                },
-                onChange: (texting) {
-                  if (texting.runtimeType != String) {
-                    listText.add({"text": texting, "key": "teacherMale"});
-                  } else {
-                    setState(() {
-                      schoolDetail['teacherMale'] = texting;
-                      schoolDetail['valid'] = false;
-                      schoolDetailValid['validTeacher'] = false;
-                    });
-                  }
-                }),
-            FieldView(
-                obj: {
-                  "width": 60.0,
-                  "start": "Nữ",
-                  "end": "người",
-                  "text": schoolDetail['teacherFemale'],
-                  "type": TextInputType.number,
-                },
-                onChange: (texting) {
-                  if (texting.runtimeType != String) {
-                    listText.add({"text": texting, "key": "teacherFemale"});
-                  } else {
-                    setState(() {
-                      schoolDetail['teacherFemale'] = texting;
-                      schoolDetail['valid'] = false;
-                      schoolDetailValid['validTeacher'] = false;
-                    });
-                  }
-                })
-          ])),
+      GestureDetector(
+          onTap: () {
+            if (schoolDetail['teacher'] == "" ||
+                schoolDetail['teacher'] == "0") {
+              _showToast('Tổng số GV/C.bộ đang trống');
+            }
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: AbsorbPointer(
+              absorbing: schoolDetail['teacher'] == "" ||
+                  schoolDetail['teacher'] == "0",
+              child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 2,
+                          color: schoolDetailValid['validTeacher'] == false
+                              ? Colors.transparent
+                              : Colors.redAccent)),
+                  margin: const EdgeInsets.fromLTRB(8, 0, 6, 0),
+                  child: Row(children: [
+                    FieldView(
+                        obj: {
+                          "width": 60.0,
+                          "pre": "Trong đó:",
+                          "start": "Nam",
+                          "end": "người",
+                          "text": schoolDetail['teacherMale'],
+                          "type": TextInputType.number,
+                        },
+                        onChange: (texting) {
+                          if (texting.runtimeType != String) {
+                            listText
+                                .add({"text": texting, "key": "teacherMale"});
+                          } else {
+                            setState(() {
+                              schoolDetail['teacherMale'] = texting;
+                              schoolDetail['valid'] = false;
+                              schoolDetailValid['validTeacher'] = false;
+                            });
+                          }
+                        },
+                        onUnfocus: (texting) {
+                          _relation('teacherMale', texting, teacherRelate);
+                        }),
+                    FieldView(
+                        obj: {
+                          "width": 60.0,
+                          "start": "Nữ",
+                          "end": "người",
+                          "text": schoolDetail['teacherFemale'],
+                          "type": TextInputType.number,
+                        },
+                        onChange: (texting) {
+                          if (texting.runtimeType != String) {
+                            listText
+                                .add({"text": texting, "key": "teacherFemale"});
+                          } else {
+                            setState(() {
+                              schoolDetail['teacherFemale'] = texting;
+                              schoolDetail['valid'] = false;
+                              schoolDetailValid['validTeacher'] = false;
+                            });
+                          }
+                        },
+                        onUnfocus: (texting) {
+                          _relation('teacherFemale', texting, teacherRelate);
+                        })
+                  ])))),
       Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         Container(
             padding: const EdgeInsets.all(10),
@@ -967,6 +1094,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               if (texting.runtimeType != String) {
                 listText.add({"text": texting, "key": "peopleEvac"});
               } else {
+                _resetRelation('peopleEvacMale', peopleEvacRelate);
                 setState(() {
                   schoolDetail['peopleEvac'] = texting;
                   schoolDetail['valid'] = false;
@@ -975,55 +1103,76 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               }
             })
       ]),
-      Container(
-          decoration: BoxDecoration(
-              border: Border.all(
-                  width: 2,
-                  color: schoolDetailValid['validPeople'] == false
-                      ? Colors.transparent
-                      : Colors.redAccent)),
-          margin: const EdgeInsets.fromLTRB(8, 0, 6, 0),
-          child: Row(children: [
-            FieldView(
-                obj: {
-                  "width": 60.0,
-                  "pre": "Trong đó:",
-                  "start": "Nam",
-                  "end": "người",
-                  "text": schoolDetail['peopleEvacMale'],
-                  "type": TextInputType.number,
-                },
-                onChange: (texting) {
-                  if (texting.runtimeType != String) {
-                    listText.add({"text": texting, "key": "peopleEvacMale"});
-                  } else {
-                    setState(() {
-                      schoolDetail['peopleEvacMale'] = texting;
-                      schoolDetail['valid'] = false;
-                      schoolDetailValid['validPeople'] = false;
-                    });
-                  }
-                }),
-            FieldView(
-                obj: {
-                  "width": 60.0,
-                  "start": "Nữ",
-                  "end": "người",
-                  "text": schoolDetail['peopleEvacFemale'],
-                  "type": TextInputType.number,
-                },
-                onChange: (texting) {
-                  if (texting.runtimeType != String) {
-                    listText.add({"text": texting, "key": "peopleEvacFemale"});
-                  } else {
-                    setState(() {
-                      schoolDetail['peopleEvacFemale'] = texting;
-                      schoolDetail['valid'] = false;
-                      schoolDetailValid['validPeople'] = false;
-                    });
-                  }
-                })
-          ])),
+      GestureDetector(
+          onTap: () {
+            if (schoolDetail['peopleEvac'] == "" ||
+                schoolDetail['peopleEvac'] == "0") {
+              _showToast('Tổng số người có thể sơ tán đang trống');
+            }
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: AbsorbPointer(
+              absorbing: schoolDetail['peopleEvac'] == "" ||
+                  schoolDetail['peopleEvac'] == "0",
+              child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 2,
+                          color: schoolDetailValid['validPeople'] == false
+                              ? Colors.transparent
+                              : Colors.redAccent)),
+                  margin: const EdgeInsets.fromLTRB(8, 0, 6, 0),
+                  child: Row(children: [
+                    FieldView(
+                        obj: {
+                          "width": 60.0,
+                          "pre": "Trong đó:",
+                          "start": "Nam",
+                          "end": "người",
+                          "text": schoolDetail['peopleEvacMale'],
+                          "type": TextInputType.number,
+                        },
+                        onChange: (texting) {
+                          if (texting.runtimeType != String) {
+                            listText.add(
+                                {"text": texting, "key": "peopleEvacMale"});
+                          } else {
+                            setState(() {
+                              schoolDetail['peopleEvacMale'] = texting;
+                              schoolDetail['valid'] = false;
+                              schoolDetailValid['validPeople'] = false;
+                            });
+                          }
+                        },
+                        onUnfocus: (texting) {
+                          _relation(
+                              'peopleEvacMale', texting, peopleEvacRelate);
+                        }),
+                    FieldView(
+                        obj: {
+                          "width": 60.0,
+                          "start": "Nữ",
+                          "end": "người",
+                          "text": schoolDetail['peopleEvacFemale'],
+                          "type": TextInputType.number,
+                        },
+                        onChange: (texting) {
+                          if (texting.runtimeType != String) {
+                            listText.add(
+                                {"text": texting, "key": "peopleEvacFemale"});
+                          } else {
+                            setState(() {
+                              schoolDetail['peopleEvacFemale'] = texting;
+                              schoolDetail['valid'] = false;
+                              schoolDetailValid['validPeople'] = false;
+                            });
+                          }
+                        },
+                        onUnfocus: (texting) {
+                          _relation(
+                              'peopleEvacFemale', texting, peopleEvacRelate);
+                        })
+                  ])))),
     ]);
   }
 

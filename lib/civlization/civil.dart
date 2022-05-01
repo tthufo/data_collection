@@ -185,6 +185,16 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             detailList[position]['female'] == "0");
   }
 
+  _resetPeople() {
+    setState(() {
+      people['maleNo'] = "";
+      people['femaleNo'] = "";
+    });
+
+    (fieldView[1]['text'] as TextEditingController).text = "";
+    (fieldView[2]['text'] as TextEditingController).text = "";
+  }
+
   _addingHouse(data) async {
     context.loaderOverlay.show();
     var token = await Storing().getString('token');
@@ -524,6 +534,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                                   }
                                   if (typing == "peopleNo") {
                                     _resetDetailList();
+                                    _resetPeople();
                                     setState(() {
                                       people['valid'] = false;
                                       people['validGender'] = false;
