@@ -198,7 +198,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   _addingHouse(data) async {
     context.loaderOverlay.show();
     var token = await Storing().getString('token');
-    var postUri = Uri.parse('${Info.url}api/houseHold');
+    var postUri = Uri.parse("${Info.url}api/household");
     var request = http.MultipartRequest(
       "POST",
       postUri,

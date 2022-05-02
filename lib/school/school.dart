@@ -180,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   _addingSchool(data) async {
     context.loaderOverlay.show();
     var token = await Storing().getString('token');
-    var postUri = Uri.parse('${Info.url}/api/school');
+    var postUri = Uri.parse("${Info.url}api/school");
     var request = http.MultipartRequest(
       "POST",
       postUri,
@@ -216,7 +216,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     ];
     for (var obj in gradeList) {
       if (grade[obj.keys.first] == "1") {
-        request.fields['phanloai_id'] = obj.values.first;
+        request.fields['phanloai_id'] = obj.values.first is int
+            ? obj.values.first.toString()
+            : obj.values.first;
         break;
       }
     }
@@ -228,7 +230,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     ];
     for (var obj in conList) {
       if (grade[obj.keys.first] == "1") {
-        request.fields['tinhtrang_id'] = obj.values.first;
+        request.fields['tinhtrang_id'] = obj.values.first is int
+            ? obj.values.first.toString()
+            : obj.values.first;
         break;
       }
     }
@@ -249,8 +253,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     request.files.add(http.MultipartFile.fromBytes(
         'images', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
         contentType: MediaType('image', ext)));
-
-    print(request.fields);
 
     var response = await request.send();
     var responseData = await response.stream.toBytes();
