@@ -840,6 +840,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     String index_2 = data['index_2'] as String;
     String key_1 = data['key_1'] as String;
     String key_2 = data['key_2'] as String;
+
     setState(() {
       schoolDetail[key_1] = "";
       schoolDetail[key_2] = "";

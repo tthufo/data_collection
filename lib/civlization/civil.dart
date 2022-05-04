@@ -196,6 +196,8 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   _addingHouse(data) async {
+    // print(data);
+    // return;
     context.loaderOverlay.show();
     var token = await Storing().getString('token');
     var postUri = Uri.parse("${Info.url}api/household");
@@ -354,6 +356,8 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       for (var detail in detailList) {
         detail['owner'] = false;
       }
+      (fieldView.last['text'] as TextEditingController).text =
+          detailList.first['birthDay'];
     });
 
     for (var text in fieldView) {
@@ -437,6 +441,8 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
       ];
     });
 
+    // print(fieldView);
+
     for (var text in fieldView) {
       TextEditingController textField = text['text'];
       textField.clear();
@@ -469,6 +475,7 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             'other': '0',
           },
         );
+        (fieldView.last['text'] as TextEditingController).clear();
       } else {
         if (detailList[position - 1]['houseHold'] == "1") {
           for (var i = position; i < detailList.length; i++) {
@@ -476,6 +483,8 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
             detailList[i]['houseHold'] = '0';
           }
         }
+        (fieldView.last['text'] as TextEditingController).text =
+            detailList[position]['birthDay'];
       }
     });
   }
@@ -614,8 +623,14 @@ class _MyCivilPageState extends State<MyHomePage> with WidgetsBindingObserver {
                               }
                             },
                             onChange: (texting) {
+                              String typing = texting['type'];
+                              if (typing == "fieldView") {
+                                fieldView.add({
+                                  "text": texting['text'][0],
+                                  "key": "birthDay"
+                                });
+                              }
                               setState(() {
-                                String typing = texting['type'];
                                 if (typing == "male" || typing == "female") {
                                   _resetGender(typing);
                                   setState(() {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../component/checker.dart';
+import '../component/textfield.dart';
+import 'package:flutter/services.dart';
 
 class Detailing extends StatefulWidget {
   final Map<String, dynamic> obj;
@@ -20,9 +22,14 @@ class Detailing extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<Detailing> {
+  List<dynamic> listText = <dynamic>[];
+  bool focus = false;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback(
+        (_) => widget.onChange({'type': 'fieldView', 'text': listText}));
   }
 
   @override
@@ -61,7 +68,8 @@ class _MyHomePageState extends State<Detailing> {
     var formatter = DateFormat('yyyy');
     String formattedDate = formatter.format(now);
 
-    return (int.parse(formattedDate) - int.parse(birthDay.split('/')[2]))
+    return (int.parse(formattedDate) -
+            int.parse(birthDay)) //int.parse(birthDay.split('/')[2]))
         .toString();
   }
 
@@ -83,28 +91,72 @@ class _MyHomePageState extends State<Detailing> {
                       ),
                     ),
                     const SizedBox(
-                      width: 5,
+                      width: 0,
                     ),
-                    GestureDetector(
-                        onTap: () {
-                          _selectDate(context);
+                    FieldView(
+                        obj: {
+                          "limit": 4,
+                          "max": "",
+                          "width": 80.0,
+                          "text": widget.obj['birthDay'] ?? '',
+                          "type": TextInputType.number,
                         },
-                        child: Container(
-                            height: 30,
-                            width: 100,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Colors.blueAccent, width: 1.5),
-                                borderRadius: BorderRadius.circular(4.0)),
-                            child: Text(widget.obj['birthDay'] ?? ''))),
-                    const SizedBox(width: 10),
+                        onChange: (texting) {
+                          if (texting.runtimeType != String) {
+                            listText.add(texting);
+                          } else {
+                            widget.onChange(
+                                {'text': texting, "type": 'birthDay'});
+                          }
+                        },
+                        onUnfocus: (texting) {
+                          var now = DateTime.now();
+                          var formatter = DateFormat('yyyy');
+                          String formattedDate = formatter.format(now);
+                          setState(() {
+                            focus = false;
+                            if (texting == "") {
+                              return;
+                            }
+                            if (int.parse(texting) < 1900) {
+                              (listText[0] as TextEditingController).text =
+                                  '1900';
+                              widget.onChange(
+                                  {'text': '1900', "type": 'birthDay'});
+                            }
+                            if (int.parse(texting) > int.parse(formattedDate)) {
+                              (listText[0] as TextEditingController).text =
+                                  formattedDate;
+                              widget.onChange(
+                                  {'text': formattedDate, "type": 'birthDay'});
+                            }
+                          });
+                        },
+                        onFocus: (texting) {
+                          setState(() {
+                            focus = true;
+                          });
+                        }),
+                    // GestureDetector(
+                    //     onTap: () {
+                    //       _selectDate(context);
+                    //     },
+                    //     child: Container(
+                    //         height: 30,
+                    //         width: 100,
+                    //         alignment: Alignment.center,
+                    //         decoration: BoxDecoration(
+                    //             border: Border.all(
+                    //                 color: Colors.blueAccent, width: 1.5),
+                    //             borderRadius: BorderRadius.circular(4.0)),
+                    //         child: Text(widget.obj['birthDay'] ?? ''))),
+                    const SizedBox(width: 5),
                     const Text('Năm sinh'),
                     const SizedBox(width: 10),
                     Text(
                       "${getYear()} tuổi",
-                      style: const TextStyle(
-                          color: Colors.grey,
+                      style: TextStyle(
+                          color: focus ? Colors.transparent : Colors.grey,
                           fontStyle: FontStyle.italic,
                           fontSize: 12),
                     )

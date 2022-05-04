@@ -4,11 +4,16 @@ import 'package:flutter/services.dart';
 class FieldView extends StatefulWidget {
   final Function(dynamic) onChange;
   final Function(dynamic)? onUnfocus;
+  final Function(dynamic)? onFocus;
 
   final Map<String, dynamic> obj;
 
   const FieldView(
-      {Key? key, required this.onChange, required this.obj, this.onUnfocus})
+      {Key? key,
+      required this.onChange,
+      required this.obj,
+      this.onUnfocus,
+      this.onFocus})
       : super(key: key);
 
   @override
@@ -43,6 +48,10 @@ class _MyHomePageState extends State<FieldView> {
       _textController.text = formated;
       if (widget.onUnfocus != null) {
         widget.onUnfocus!(formated);
+      }
+    } else {
+      if (widget.onFocus != null) {
+        widget.onFocus!('');
       }
     }
   }

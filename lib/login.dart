@@ -249,6 +249,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       return;
     }
     if (password.isEmpty || name.isEmpty) {
+      // Storing().addString('data', 'token');
+      // Route route = MaterialPageRoute(builder: (context) => const OptionView());
+      // Navigator.pushReplacement(context, route);
       setState(() {
         errorMessage = "Bạn cần nhập đủ thông tin đăng nhập";
       });
